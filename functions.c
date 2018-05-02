@@ -80,7 +80,7 @@ Pessoa *cria_pessoa(lista_pessoas lista){ /* Criar uma pessoa/trabalhador em mem
 
         novo->mytasks = cria_lista_tarefas();
 
-        printf("Pressione qualquer tecla para continuar... ");
+        printf("Pressione Enter para continuar... ");
         getchar();
 
         return novo;
@@ -108,7 +108,7 @@ void imprime_lista_pessoas(lista_pessoas lista){ /* Fazer display de uma lista d
 
         }
 
-        printf("Pressione qualquer tecla para continuar... ");
+        printf("Pressione Enter para continuar... ");
         getchar();
 
 }
@@ -210,7 +210,7 @@ void worker_info(lista_pessoas lista){ /* Obter informação de um trabalhador */
         getchar();
 }
 
-void cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
+Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         Task *nova = (Task *)malloc(sizeof(Task));
 
@@ -237,10 +237,12 @@ void cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         printf("ID: %d\n", nova->id);
 
-        printf("Pressione qualquer tecla para continuar... ");
+        printf("Pressione Enter para continuar... ");
         getchar();
 
         insere_tarefa(lista,nova);
+
+        return nova;
 }
 
 void insere_tarefa(lista_task lista, Task *nova){ /* Inserir uma tarefa numa lista ligada */
@@ -305,7 +307,7 @@ void imprime_lista_tarefas(lista_task lista){ /* Fazer diplay de TODAS as tarefa
 
         }
 
-        printf("Pressione qualquer tecla para continuar... ");
+        printf("Pressione Enter para continuar... ");
         getchar();
 
 
@@ -386,12 +388,12 @@ void atribui_tarefa(lista_pessoas lista_p, lista_task lista_t){ /*atribuir uma t
                 printf("ID errado. Tente novamente.\n\n");
         }
 
-        printf("Pressione qualquer tecla para continuar... ");
+        printf("Pressione Enter para continuar... ");
         getchar();
 
 }
 
-void elimina_no_task(lista_task tarefa, int id){
+void elimina_no_task(lista_task tarefa, int id){ /* Função para retirar elemento de uma lista de tarefas */
 
         lista_task act;
         lista_task ant;
@@ -412,7 +414,7 @@ void elimina_no_task(lista_task tarefa, int id){
 
 }
 
-void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t){
+void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t){ /* Função principal para desassociar uma tarefa de a um dado trabalhador */
 
         int id;
         int found;
@@ -454,7 +456,7 @@ void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t){
                 printf("ID errado. Tente novamente.\n\n");
 
         }
-        printf("Pressione qualquer tecla para continuar... ");
+        printf("Pressione Enter para continuar... ");
         getchar();
 
 }

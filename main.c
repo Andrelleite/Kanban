@@ -8,10 +8,11 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
         Task *temp;
         system("cls");
 
-        printf("\n\t MAIN MENU\n\n\n______ TRABALHADORES ______\n\n[1] Inserir Pessoa\n[2] Vizualizar Lista de Trabalhadores\n[3] Informacao do trabalhador\n\n");
-        printf("______    TAREFAS    ______\n\n[4] Criar Nova Tarefa\n[5] Vizualizar Lista de Tarefas\n[6] Atribuir Tarefa\n[7] Desassociar Tarefa\n\n");
-        printf("______ KANBAN STATUS ______\n\n[8] Tarefas na secao To Do\n[9] Tarefas na seccao Doing\n[10] Tarefas na seccao Done\n\n0. Exit\n\n");
-        printf("\nOpcao: ");
+        printf("\n       | MAIN MENU |\n\n\n______ TRABALHADORES ______\n\n[1] Inserir Pessoa\n[2] Vizualizar Lista de Trabalhadores\n[3] Informacao do trabalhador\n\n");
+        printf("______    TAREFAS    ______\n\n[4] Criar Nova Tarefa\n[5] Vizualizar Lista de Tarefas\n[6] Atribuir Tarefa *Funcao interna*\n[7] Desassociar Tarefa *Funcao interna*\n\n");
+        printf("______ KANBAN STATUS ______\n\n[8] Visualizar todo o quadro\n[9] Tarefas na secao To Do\n[10] Tarefas na seccao Doing\n[11] Tarefas na seccao Done\n\n");
+        printf("______KANBAN LISTS OPS______\n\n[12] Mover tarefa para Doing\n[13] Mover tarefa para Done\n[14] Mover tarefa para To Do\n\n[0] Exit\n\n");
+        printf("\nOpcao [ ] : ");
         scanf("%d", &choice);
         getchar();
         printf("\n");
@@ -45,19 +46,29 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                 case 8:
                         printf("\n      [To Do Section]\n\n");
                         imprime_lista_tarefas(Todo);
+                        printf("\n      [Done Section]\n\n");
+                        imprime_lista_tarefas(Done);
+                        printf("\n      [Doing Section]\n\n");
+                        imprime_lista_tarefas(Doing);
                         menu(P_Lista,T_Lista,Todo,Doing,Done);
                         break;
                 case 9:
+                        printf("\n      [To Do Section]\n\n");
+                        imprime_lista_tarefas(Todo);
+                        menu(P_Lista,T_Lista,Todo,Doing,Done);
+                        break;
+                case 10:
                         printf("\n      [Done Section]\n\n");
                         imprime_lista_tarefas(Done);
                         menu(P_Lista,T_Lista,Todo,Doing,Done);
                         break;
-                case 10:
+                case 11:
                         printf("\n      [Doing Section]\n\n");
                         imprime_lista_tarefas(Doing);
                         menu(P_Lista,T_Lista,Todo,Doing,Done);
                         break;
                 case 0:
+                        printf("**Toda a informacao foi guardada em ficheiros **\n");
                         break;
                 default:
                         menu(P_Lista, T_Lista,Todo,Doing,Done);

@@ -64,7 +64,7 @@ lista_pessoas cria_lista_pessoas();
 
 Pessoa *cria_pessoa(lista_pessoas lista);
 
-void cria_tarefa(lista_task lista);
+Task *cria_tarefa(lista_task lista);
 
 void insere_pessoa(lista_pessoas lista);
 
@@ -85,5 +85,7 @@ void atribui_tarefa(lista_pessoas lista_p, lista_task lista_t);
 void elimina_no_task(lista_task tarefa, int id);
 
 void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t);
+
+
 
 #endif
