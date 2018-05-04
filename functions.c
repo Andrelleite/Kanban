@@ -4,13 +4,22 @@
 #include "header.h"
 
 
-/***
+/**
 
         Todas as funções têm um papel fulcral, sendo que existem algumas que se tornam preponderantes na implementação deste código, uma vez que são utilizadas constantemente
         e até mesmo chamadas pelas outras funções, de modo a tornar o código mais eficiente, mais versátil e mais leve. É importante manter um código bem estruturado para que a sua
         manutenção seja fácil
 
-***/
+        GitHub -> https://github.com/Andrelleite
+
+        n of functions : 16
+        voids : 8
+        Task* : 1
+        Pessoa* : 1
+        Data* :  1
+        int: 3
+
+**/
 
 lista_task cria_lista_tarefas(){ /* Função para inicializar a lista de tarefas*/
 
@@ -220,9 +229,16 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         nova->id = lista->n+1;
 
-        printf("Prioridade: ");
+        printf("Prioridade (1-10) : ");
         scanf("%d",&nova->priority);
         getchar();
+
+        while(nova->priority < 1 || nova->priority > 10){
+                printf("\nPrioridade Invalidade. Tente um valor de  1 a 10.\n");
+                printf("\nPrioridade (1-10) : ");
+                scanf("%d",&nova->priority);
+                getchar();
+        }
 
         printf("Descricao: ");
         nova->descricao = (char *)malloc(30*sizeof(char));
@@ -325,7 +341,7 @@ Data *set_data(){ /* Criar uma data */
 
 }
 
-void atribui_tarefa(lista_pessoas lista_p, lista_task lista_t){ /*atribuir uma tarefa a um dado trabalhador */
+int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atribuir uma tarefa a um dado trabalhador */
 
         lista_pessoas act;
         lista_task task;
@@ -333,14 +349,17 @@ void atribui_tarefa(lista_pessoas lista_p, lista_task lista_t){ /*atribuir uma t
         int id;
         int got;
         int choice;
+        int passed = 0;
 
         printf("_____Atribuicao de tarefas_____\n\n");
 
         printf("Vizualizar trabalhadores? [ 1 - sim / 0 - nao ]\n->");
         scanf("%d",&choice);
         printf("\n");
+
         if(choice){
-               imprime_lista_pessoas(lista_p);
+                imprime_lista_pessoas(lista_p);
+                printf("\n");
         }
 
         printf("\nID do trabalhador: ");
@@ -358,13 +377,14 @@ void atribui_tarefa(lista_pessoas lista_p, lista_task lista_t){ /*atribuir uma t
 
                 if(choice){
                         imprime_lista_tarefas(lista_t);
+                        printf("\n");
                 }
 
                 printf("\nID da tarefa: ");
                 scanf("%d",&id);
                 getchar();
                 printf("\n");
-
+                *idp = id;
                 got = get_task(lista_t,&ant,&task, id);
 
                 if(got){
@@ -372,6 +392,7 @@ void atribui_tarefa(lista_pessoas lista_p, lista_task lista_t){ /*atribuir uma t
                         if(task->tarefa->worker == NULL){
                                 insere_tarefa(act->p->mytasks,task->tarefa);
                                 task->tarefa->worker = act->p;
+                                passed = 1;
                         }
                         else if(task->tarefa->worker->id == act->p->id){
                                 printf("Esta tarefa ja esta atribuida\n\n");
@@ -391,25 +412,18 @@ void atribui_tarefa(lista_pessoas lista_p, lista_task lista_t){ /*atribuir uma t
         printf("Pressione Enter para continuar... ");
         getchar();
 
+        return passed;
+
 }
 
-void elimina_no_task(lista_task tarefa, int id){ /* Função para retirar elemento de uma lista de tarefas */
+void elimina_no_task(lista_task tarefa, lista_task ant, lista_task act){ /* Função para retirar elemento de uma lista de tarefas */
 
-        lista_task act;
-        lista_task ant;
-        int found;
 
-        found = get_task(tarefa,&ant,&act,id);
+        tarefa->n--;
+        act->tarefa = NULL;
+        ant->next = act->next;
+        printf("\nTarefa eliminada com sucesso.\n\n");
 
-        if(found){
-                act->tarefa->worker->mytasks->n--;
-                act->tarefa->worker = NULL;
-                ant->next = act->next;
-                printf("\nTarefa desassociada com sucesso.\n\n");
-        }else{
-
-                printf("ID errado. Tente Novamente.\n\n");
-        }
 
 
 }
@@ -419,7 +433,7 @@ void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t){ /* Função pri
         int id;
         int found;
         lista_pessoas act;
-
+        lista_task ante, pos;
         system("cls");
 
         printf("\n\n\tDesassociar Tarefa\n\n");
@@ -444,7 +458,13 @@ void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t){ /* Função pri
                         printf("\n\nID da tarefa: ");
                         scanf("%d",&id);
                         getchar();
-                        elimina_no_task(act->p->mytasks,id);
+                        found = get_task(act->p->mytasks,&ante,&pos,id);
+
+                        if(found){
+                                elimina_no_task(act->p->mytasks,ante,pos);
+                        }else{
+                                printf("ID errado. Tente novamente.\n\n");
+                        }
 
                 }else{
 
@@ -460,3 +480,52 @@ void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t){ /* Função pri
         getchar();
 
 }
+
+void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag){ /*Passagem de tarefas para sectores de KANBAN */
+
+        int id, found;
+        int *idp = (int *)malloc(sizeof(int));
+        int passed = 0;
+        lista_task ante, pos;
+        printf("\n_____Passagem de Sector_____\n\n");
+
+        if(from->next == NULL){
+                printf("\nEsta seccao nao tem tarefas disponiveis para passagem\n\n");
+        }else{
+
+                if(flag == 1){
+
+                       passed = atribui_tarefa(lista_p, from, idp);
+
+                        if(passed){
+
+                                printf("Processando tarefa com ID: %d\n\n",*idp);
+                                id = *idp;
+                                found = get_task(from,&ante,&pos,id);
+                                if(found){
+                                        insere_tarefa(to,pos->tarefa);
+                                        elimina_no_task(from,ante,pos);
+                                }
+                        }
+                        else if(!passed){
+                                printf("\nImpossivel mover tarefa para sector uma vez que nao foi associada com sucesso.\n");
+                        }
+                        else{
+                                printf("ID errado. Tente novamente.\n\n");
+                        }
+
+                }else if(flag == 0){
+
+
+
+                }
+
+
+        }
+
+
+        printf("Pressione Enter para continuar... ");
+        getchar();
+
+}
+

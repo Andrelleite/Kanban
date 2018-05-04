@@ -70,6 +70,8 @@ void insere_pessoa(lista_pessoas lista);
 
 void insere_tarefa(lista_task lista, Task *tarefa);
 
+int get_task(lista_task lista,lista_task *ant ,lista_task *act, int id);
+
 void imprime_lista_pessoas(lista_pessoas lista);
 
 void imprime_lista_tarefas(lista_task lista);
@@ -80,12 +82,12 @@ void worker_info(lista_pessoas lista);
 
 Data *set_data();
 
-void atribui_tarefa(lista_pessoas lista_p, lista_task lista_t);
+int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp);
 
-void elimina_no_task(lista_task tarefa, int id);
+void elimina_no_task(lista_task tarefa, lista_task ant, lista_task act);
 
 void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t);
 
-
+void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag);
 
 #endif
