@@ -86,8 +86,8 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp);
 
 void elimina_no_task(lista_task tarefa, lista_task ant, lista_task act);
 
-void desassocia_tarefa(lista_pessoas lista_p, lista_task lista_t);
+void desassocia_tarefa(Task *task);
 
-void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag);
+void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo);
 
 #endif

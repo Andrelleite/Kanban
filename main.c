@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include "header.h"
 
+
+
 void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task Doing, lista_task Done){
 
         int choice, choice_2;
         Task *temp;
         system("cls");
 
-        printf("\n       | MAIN MENU |\n\n\n______ TRABALHADORES ______\n\n[1] Inserir Pessoa\n[2] Vizualizar Lista de Trabalhadores\n[3] Informacao do trabalhador\n\n");
+        printf("       | MAIN MENU |\n\n______ TRABALHADORES ______\n\n[1] Inserir Pessoa\n[2] Vizualizar Lista de Trabalhadores\n[3] Informacao do trabalhador\n\n");
         printf("______    TAREFAS    ______\n\n[4] Criar Nova Tarefa\n[5] Vizualizar Lista de Tarefas\n\n");
         printf("______ KANBAN STATUS ______\n\n[6] Visualizar todo o quadro\n[7] Tarefas na secao To Do\n[8] Tarefas na seccao Doing\n[9] Tarefas na seccao Done\n\n");
         printf("______KANBAN LISTS OPS______\n\n[10] Mover tarefa em To Do\n[11] Mover tarefa em Doing\n[12] Mover tarefa em Done\n\n[0] Exit\n\n");
@@ -76,7 +78,7 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                                 case 1:
                                         printf("\n     [TO DO] -> [DOING]");
                                         printf("\n  *Atribuicao obrigatoria.*\n");
-                                        pass_section(Todo,Doing,P_Lista,1);
+                                        pass_section(Todo,Doing,P_Lista,1,0);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação , tipo = 0 TO do | tipo = 1 Doing | tipo = 2 Done*/
                                         break;
                                 default:
                                         break;
@@ -96,10 +98,12 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                                 case 1:
                                         printf("\n     [DOING] -> [TO DO]");
                                         printf("\n  *Desvincula Trabalhador atual.*\n");
+                                        pass_section(Doing,Todo,P_Lista,0,0);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação */
                                         break;
                                 case 2:
                                         printf("\n     [DOING] -> [DONE]");
                                         printf("\n  *Desvincula Trabalhador atual.*\n");
+                                        pass_section(Doing,Done,P_Lista,0,2);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação */
                                         break;
                                 default:
                                         break;
@@ -118,10 +122,12 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                                 case 1:
                                         printf("\n     [DONE] -> [TO DO]");
                                         printf("\n  *Atribuicao obrigatoria.*\n");
+                                        pass_section(Done,Todo,P_Lista,0,0);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação */
                                         break;
                                 case 2:
                                         printf("\n     [DONE] -> [DOING]");
                                         printf("\n  *Atribuicao obrigatoria.*\n");
+                                        pass_section(Done,Doing,P_Lista,1,2);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação */
                                         break;
                                 default:
                                         break;
@@ -136,11 +142,6 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
         }
 }
 
-void pont(int *p){
-
-        *p = 5;
-
-}
 
 int main(){
 
@@ -150,9 +151,10 @@ int main(){
         lista_task Doing_List = cria_lista_tarefas(); /*Doing Section*/
         lista_task Done_List = cria_lista_tarefas(); /*Done Section*/
 
-        menu(P_Lista, T_Lista, Todo_List, Doing_List, Done_List);
-       /* FILE *fich = fopen("workers.txt","w");
+       menu(P_Lista, T_Lista, Todo_List, Doing_List, Done_List);
+       /*FILE *fich = fopen("workers.txt","w");
         fprintf(fich, "I love cheese");*/
+
 
         return 0;
 }
