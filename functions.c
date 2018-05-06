@@ -12,12 +12,12 @@
 
         GitHub -> https://github.com/Andrelleite
 
-        n of functions : 16
+        n of functions : 17
         voids : 8
         Task* : 1
         Pessoa* : 1
         Data* :  1
-        int: 3
+        int: 4
 
 **/
 
@@ -222,7 +222,7 @@ void worker_info(lista_pessoas lista){ /* Obter informação de um trabalhador */
 Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         Task *nova = (Task *)malloc(sizeof(Task));
-
+        int comp;
         system("cls");
 
         printf("\n\n\tCriacao de Tarefa\n\n");
@@ -249,6 +249,16 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         printf("Prazo final ");
         nova->prazo = set_data();
+
+        comp = compare_date(nova->inicio,nova->prazo);
+
+        while(comp == 1 || comp == 0){
+                printf("\nPrazo definido nao valido. Insira novamente.\n\n");
+                printf("Prazo final ");
+                nova->prazo = set_data();
+                comp = compare_date(nova->inicio,nova->prazo);
+
+        }
 
         nova->fim = NULL;
         nova->worker = NULL;
@@ -459,10 +469,14 @@ void desassocia_tarefa(Task *task){ /* Função principal para desassociar uma tar
 
 void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo){ /*Passagem de tarefas para sectores de KANBAN */
 
-        int id, found;
+        int id, found, comp, comp2;
+
         int *idp = (int *)malloc(sizeof(int));
+
         int passed = 0;
+
         lista_task ante, pos;
+
         printf("\n_____Passagem de Sector_____\n\n");
 
         if(from->next == NULL){
@@ -484,6 +498,16 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                         if(passed){
                                                 printf("\nNovo prazo final ");
                                                 pos->tarefa->prazo = set_data();
+
+                                                comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);
+
+                                                while(comp == 0 || comp == 1){
+                                                        printf("\nPrazo inserido nao valido. Tente novamente.\n\n");
+                                                        printf("Novo Prazo final ");
+                                                        pos->tarefa->prazo = set_data();
+                                                        comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);
+                                                }
+
                                         }
                                         if(tipo == 2){
                                                 pos->tarefa->fim = NULL;
@@ -520,6 +544,20 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                         printf("\nPor favor indique a data de conclusao da tarefa:\n");
                                         printf("Data de conclusao ");
                                         pos->tarefa->fim = set_data();
+
+                                        comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
+                                        comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
+
+                                                while(comp2 == 1 || comp == -1){
+                                                        printf("\nData de conclusao inserida nao valida. Tente novamente.\n\n");
+                                                        printf("Data de conclusao ");
+                                                        pos->tarefa->fim = set_data();
+                                                        comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
+                                                        comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
+
+                                                }
+
+
                                         desassocia_tarefa(pos->tarefa);
                                 }else if(tipo == 0){
                                         pos->tarefa->fim = NULL;
@@ -542,3 +580,19 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
 
 }
 
+int compare_date(Data *d1, Data *d2){
+
+        long int ex_d1 = (d1->ano * 10000) + (d1->mes * 100) + d1->dia;
+        long int ex_d2 = (d2->ano * 10000) + (d2->mes * 100) + d2->dia;
+
+        int comp = 0;
+
+        if(ex_d1 > ex_d2){
+                comp = 1;
+        }else if(ex_d1 < ex_d2){
+                comp = -1;
+        }
+
+        return comp;
+
+}

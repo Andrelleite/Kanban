@@ -90,4 +90,6 @@ void desassocia_tarefa(Task *task);
 
 void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo);
 
+int compare_date(Data *d1, Data *d2);
+
 #endif
