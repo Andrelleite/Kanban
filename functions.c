@@ -382,7 +382,7 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                                 then = then->next;
                         }
 
-                      if(nova->priority >= then->tarefa->priority ){
+                      if(nova->priority > then->tarefa->priority ){
 
                                 ante->next = no;
                                 no->next = then;
@@ -394,7 +394,27 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                                 then->next = no;
 
                       }
+                      else if (nova->priority == then->tarefa->priority){
 
+
+                                while( compare_date(nova->prazo , then->tarefa->prazo) == 1 && (nova->priority == then->tarefa->priority) && (then->next != NULL )){
+                                        printf("Che");
+                                        ante = then;
+                                        then = then->next;
+
+                                }
+
+                                if(compare_date(nova->prazo,then->tarefa->prazo) == 1){
+                                        no->next = then->next;
+                                        then->next = no;
+                                }
+                                else if(compare_date(nova->prazo , then->tarefa->prazo) != 1 ){
+
+                                        ante->next = no;
+                                        no->next = then;
+
+                                }
+                      }
 
                 }
                 else if(flag == 3){ /* Ordenamento por ordem alfabetica */
@@ -421,6 +441,10 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                 }
 
         }
+
+
+        printf("");
+        getchar();
 
 }
 
