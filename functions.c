@@ -12,7 +12,7 @@
 
         GitHub -> https://github.com/Andrelleite
 
-        n of functions : 17
+        n of functions : 18
         voids : 8
         Task* : 1
         Pessoa* : 1
@@ -55,6 +55,8 @@ void insere_pessoa(lista_pessoas lista){ /* Inserção de uma pessoa numa lista li
         Pessoa *nova = cria_pessoa(lista);
         lista_pessoas no = (lista_pessoas)malloc(sizeof(P_Node));
 
+
+
         no->p = nova;
         no->n = 0;
 
@@ -87,6 +89,25 @@ Pessoa *cria_pessoa(lista_pessoas lista){ /* Criar uma pessoa/trabalhador em mem
         novo->id = lista->n + 1;
         printf("Id: %d\n\n",novo->id);
 
+        if(lista->next == NULL){
+                printf("Numero de tarefas maxima: ");
+                scanf("%d",&novo->max_task);
+                getchar();
+
+                while(novo->max_task <= 0){
+                        printf("\nAdicione um limite acima de 0.\n");
+                        printf("Numero de tarefas maxima: ");
+                        scanf("%d",&novo->max_task);
+                        getchar();
+
+                }
+
+        }else{
+                novo->max_task = lista->next->p->max_task;
+                printf("\nAtribuindo numero maximo de tarefas global (%d).\n",novo->max_task);
+        }
+
+
         novo->mytasks = cria_lista_tarefas();
 
         printf("Pressione Enter para continuar... ");
@@ -110,7 +131,7 @@ void imprime_lista_pessoas(lista_pessoas lista){ /* Fazer display de uma lista d
                 printf("__________________________________________________\n\n");
                 while(act != NULL){
                         pessoa = act->p;
-                        printf("Nome: %s | Idade: %d | E-Mail: %s | ID: %d\n__________________________________________________\n\n",pessoa->nome,pessoa->idade,pessoa->mail, pessoa->id);
+                        printf("Nome: %s | Idade: %d | E-Mail: %s | Max Tasks: %d \n | ID: %d\n__________________________________________________\n\n",pessoa->nome,pessoa->idade,pessoa->mail, pessoa->max_task,pessoa->id);
 
                         act = act->next;
                 }
@@ -156,7 +177,7 @@ int get_task(lista_task lista,lista_task *ant ,lista_task *act, int id){ /* obte
         if(lista->next == NULL){
                 printf("(Sem tarefas)\n\n");
         }
-        else if(id >= 0 && id <= lista->n + 1){
+        else if(id >= 0 ){
 
                 while(*act != NULL && found == 0){
 
@@ -268,24 +289,98 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
         printf("Pressione Enter para continuar... ");
         getchar();
 
-        insere_tarefa(lista,nova);
+        insere_tarefa(lista,nova,0);
 
         return nova;
 }
 
-void insere_tarefa(lista_task lista, Task *nova){ /* Inserir uma tarefa numa lista ligada */
+void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma tarefa numa lista ligada */
+
+        lista_task then = lista->next;
+        lista_task ante = lista;
 
         lista_task no = (lista_task)malloc(sizeof(Node));
         printf("\nA inserir tarefa...\n");
+
         no->tarefa = nova;
         no->n = 0;
         lista->n++;
 
-        if(nova != NULL && lista != NULL){
+        if(nova != NULL && then == NULL){
 
-                no->next = lista->next;
-                lista->next = no;
+                no->next = then;
+                ante->next = no;
                 printf("Tarefa inserida.\n");
+        }
+
+        else if(nova != NULL && then != NULL){
+
+                if(flag == 0){
+
+                        while(compare_date(nova->inicio,then->tarefa->inicio) == 1 && then->next != NULL){
+
+                                ante = then;
+                                then = then->next;
+                        }
+
+                      if(compare_date(nova->inicio , then->tarefa->inicio) != 1 ){
+
+                                ante->next = no;
+                                no->next = then;
+
+                      }
+                      else if (compare_date(nova->inicio, then->tarefa->inicio)){
+
+                                no->next = then->next;
+                                then->next = no;
+
+                      }
+
+                }else if(flag == 1){
+
+                        while(compare_date(nova->fim,then->tarefa->fim) == 1 && then->next != NULL){
+
+                                ante = then;
+                                then = then->next;
+                        }
+
+                      if(compare_date(nova->fim , then->tarefa->fim) != 1 ){
+
+                                ante->next = no;
+                                no->next = then;
+
+                      }
+                      else if (compare_date(nova->fim, then->tarefa->fim)){
+
+                                no->next = then->next;
+                                then->next = no;
+
+                      }
+
+
+                }else if(flag == 2){
+
+                        while(nova->priority < then->tarefa->priority && then->next != NULL){
+
+                                ante = then;
+                                then = then->next;
+                        }
+
+                      if(nova->priority >= then->tarefa->priority ){
+
+                                ante->next = no;
+                                no->next = then;
+
+                      }
+                      else if (nova->priority < then->tarefa->priority){
+
+                                no->next = then->next;
+                                then->next = no;
+
+                      }
+
+
+                }
         }
 
 }
@@ -396,13 +491,14 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
                 scanf("%d",&id);
                 getchar();
                 printf("\n");
+
                 *idp = id;
                 got = get_task(lista_t,&ant,&task, id);
 
-                if(got){
+                if(got && act->p->mytasks->n < act->p->max_task){
 
                         if(task->tarefa->worker == NULL){
-                                insere_tarefa(act->p->mytasks,task->tarefa);
+                                insere_tarefa(act->p->mytasks,task->tarefa,0);
                                 task->tarefa->worker = act->p;
                                 passed = 1;
                         }
@@ -413,6 +509,8 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
                                 printf("Esta tarefa ja esta atribuida\n\n");
                         }
 
+                }else if( act->p->mytasks->n > act->p->max_task){
+                        printf("\nNumero de tarefas maximo atingido. Tarefa nao associada.\n\n");
                 }else{
                         printf("ID errado. Tente novamente.\n\n");
                 }
@@ -470,7 +568,7 @@ void desassocia_tarefa(Task *task){ /* Função principal para desassociar uma tar
 void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo){ /*Passagem de tarefas para sectores de KANBAN */
 
         int id, found, comp, comp2;
-
+        int trys = 0;
         int *idp = (int *)malloc(sizeof(int));
 
         int passed = 0;
@@ -483,23 +581,29 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                 printf("\nEsta seccao nao tem tarefas disponiveis para passagem\n\n");
         }else{
 
-                if(flag == 1){ /*Somente Adicionar*/
+                if(flag == 1){ /*Somente Adicionar e/ou Retirar trabalhador*/
 
                        passed = atribui_tarefa(lista_p, from, idp);
 
                         if(passed){
 
                                 printf("\nProcessando tarefa com ID: %d\n\n",*idp);
+
                                 id = *idp;
                                 found = get_task(from,&ante,&pos,id);
+
                                 if(found){
+
                                         printf("\nAlterar Prazo final ? [ 1 - sim / 0 - nao]\n-> ");
                                         scanf("%d",&passed);
+
                                         if(passed){
+
                                                 printf("\nNovo prazo final ");
+
                                                 pos->tarefa->prazo = set_data();
 
-                                                comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);
+                                                comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);  /*Teste de verificação de data*/
 
                                                 while(comp == 0 || comp == 1){
                                                         printf("\nPrazo inserido nao valido. Tente novamente.\n\n");
@@ -509,10 +613,12 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                                 }
 
                                         }
+
                                         if(tipo == 2){
                                                 pos->tarefa->fim = NULL;
                                         }
-                                        insere_tarefa(to,pos->tarefa);
+
+                                        insere_tarefa(to,pos->tarefa,0);
                                         elimina_no_task(from,ante,pos);
                                 }
                         }
@@ -523,7 +629,8 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                 printf("ID errado. Tente novamente.\n\n");
                         }
 
-                }else if(flag == 0){ /* Somente desvincular*/
+                }
+                else if(flag == 0){ /* Somente desvincular*/
 
                         printf("\nVer lista de tarefas disponiveis? [ 1 - sim / 0 - nao]\n-> ");
                         scanf("%d",&passed);
@@ -538,9 +645,13 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                         scanf("%d",&id);
                         getchar();
                         found = get_task(from,&ante,&pos,id);
+
+                        printf("%d",found);
+
                         if(found){
 
-                                if(tipo != 0){
+                                if(tipo != 0){   /* Colocar data de conclusao */
+
                                         printf("\nPor favor indique a data de conclusao da tarefa:\n");
                                         printf("Data de conclusao ");
                                         pos->tarefa->fim = set_data();
@@ -558,13 +669,17 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                                 }
 
 
-                                        desassocia_tarefa(pos->tarefa);
-                                }else if(tipo == 0){
-                                        pos->tarefa->fim = NULL;
+                                        desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
+                                        insere_tarefa(to,pos->tarefa,1);
                                 }
 
-                                insere_tarefa(to,pos->tarefa);
+                                else if(tipo == 0){
+                                        pos->tarefa->fim = NULL;
+                                        insere_tarefa(to,pos->tarefa,2);
+                                }
+
                                 elimina_no_task(from,ante,pos);
+
                         }else{
                                 printf("\nAlgo correu mal. Tente novamente.\n\n");
                         }
@@ -580,7 +695,7 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
 
 }
 
-int compare_date(Data *d1, Data *d2){
+int compare_date(Data *d1, Data *d2){ /*Comparar datas*/
 
         long int ex_d1 = (d1->ano * 10000) + (d1->mes * 100) + d1->dia;
         long int ex_d2 = (d2->ano * 10000) + (d2->mes * 100) + d2->dia;
@@ -594,5 +709,83 @@ int compare_date(Data *d1, Data *d2){
         }
 
         return comp;
+
+}
+
+void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhador responsavel por tarefa*/
+
+
+        int choice, id, found;
+        lista_task ante, then;
+        lista_pessoas atual;
+
+
+
+        if(doing->next != NULL){
+
+                printf("\nVer todas as tarefas atribuidas? [ 1- sim / 0 - nao ]\n->");
+                scanf("%d",&choice);
+                getchar();
+
+                if(choice){
+                        imprime_lista_tarefas(doing);
+                }
+
+                printf("ID da tarefa: ");
+                scanf("%d",&id);
+                getchar();
+
+                found = get_task(doing,&ante,&then,id);
+
+
+                if(found){
+
+                        printf("\nVer lista de trabalhadores? [ 1 - sim / 0 - nao ]\n->");
+                        scanf("%d",&choice);
+                        getchar();
+                        if(choice){
+                                imprime_lista_pessoas(geral);
+                        }
+
+                        printf("ID do trabalhador: ");
+                        scanf("%d",&id);
+                        getchar();
+
+                        found = get_worker(geral,&atual,id);
+
+                        if(found){
+
+                                if(atual->p->mytasks->n < atual->p->max_task){
+
+                                        desassocia_tarefa(then->tarefa);
+                                        then->tarefa->worker = atual->p;
+                                        insere_tarefa(atual->p->mytasks,then->tarefa,0);
+
+                                }else{
+
+                                        printf("\nEste trabalhador já atingiu o limite maximo de tarefas.\n");
+
+                                }
+
+                        }else{
+
+                                printf("\nAlgo esta errado. Tente novamente.\n\n");
+
+                        }
+
+                }else{
+
+                        printf("\nTarefa nao encontrada.\n");
+
+                }
+
+        }else{
+
+                printf("\nSem tarefas atribuidas.\n");
+
+        }
+
+        printf("Pressione Enter para continuar... ");
+        getchar();
 
 }

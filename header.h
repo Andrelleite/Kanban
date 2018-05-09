@@ -23,6 +23,7 @@ typedef struct pessoa{ /*estrutura para trabalhadores*/
         char *nome;
         int idade;
         char *mail;
+        int max_task;
         lista_task mytasks;
 
 
@@ -68,7 +69,7 @@ Task *cria_tarefa(lista_task lista);
 
 void insere_pessoa(lista_pessoas lista);
 
-void insere_tarefa(lista_task lista, Task *tarefa);
+void insere_tarefa(lista_task lista, Task *tarefa, int flag);
 
 int get_task(lista_task lista,lista_task *ant ,lista_task *act, int id);
 
@@ -91,5 +92,7 @@ void desassocia_tarefa(Task *task);
 void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo);
 
 int compare_date(Data *d1, Data *d2);
+
+void switch_worker(lista_task doing , lista_pessoas geral);
 
 #endif
