@@ -397,6 +397,28 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
 
 
                 }
+                else if(flag == 3){ /* Ordenamento por ordem alfabetica */
+
+                        while((strcmp(nova->worker->nome, then->tarefa->worker->nome)) > 0 && then->next != NULL){
+
+                                ante = then;
+                                then = then->next;
+                        }
+
+                      if( (strcmp(nova->worker->nome, then->tarefa->worker->nome)) < 0 ){
+
+                                ante->next = no;
+                                no->next = then;
+
+                      }
+                      else{
+
+                                no->next = then->next;
+                                then->next = no;
+
+                      }
+
+                }
 
         }
 
@@ -547,7 +569,6 @@ void elimina_no_task(lista_task tarefa, lista_task ant, lista_task act){ /* Funç
 
 
         tarefa->n--;
-        act->tarefa = NULL;
         ant->next = act->next;
         printf("\nTarefa eliminada com sucesso.\n\n");
 
@@ -646,7 +667,7 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                                 pos->tarefa->fim = NULL;
                                         }
                                         if(trys != 3){
-                                                insere_tarefa(to,pos->tarefa,0);
+                                                insere_tarefa(to,pos->tarefa,3);
                                                 elimina_no_task(from,ante,pos);
                                         }
 
@@ -686,28 +707,40 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                         printf("Data de conclusao ");
                                         pos->tarefa->fim = set_data();
 
-                                        while(check_date_erros(pos->tarefa->fim)){
+                                        while(check_date_erros(pos->tarefa->fim) && trys != 3){
                                                 printf("Data de conclusao ");
                                                 pos->tarefa->fim = set_data();
-                                        }
-
-                                        comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
-                                        comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
-
-                                        while(comp2 == 1 || comp == -1){
-                                                printf("\nData de conclusao inserida nao valida. Tente novamente.\n\n");
-                                                printf("Data de conclusao ");
-                                                pos->tarefa->fim = set_data();
-                                                comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
-                                                comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
                                                 trys++;
                                         }
-                                        if(trys == 3){
+
+                                        if(trys != 3){
+
+                                                trys = 0;
+
+                                                comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
+                                                comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
+
+                                                while(comp2 == 1 || comp == -1){
+                                                        printf("\nData de conclusao inserida nao valida. Tente novamente.\n\n");
+                                                        printf("Data de conclusao ");
+                                                        pos->tarefa->fim = set_data();
+                                                        comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
+                                                        comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
+                                                        trys++;
+                                                }
+                                                if(trys == 3){
+                                                        printf("\nExcedeu o numero maximo de tentativas para corrigir o erro.\n");
+                                                        printf("\nTodas as alteracoes serao revertidas.\n");
+                                                }else{
+                                                        desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
+                                                        insere_tarefa(to,pos->tarefa,1);
+                                                }
+
+                                        }else{
+
                                                 printf("\nExcedeu o numero maximo de tentativas para corrigir o erro.\n");
                                                 printf("\nTodas as alteracoes serao revertidas.\n");
-                                        }else{
-                                                desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
-                                                insere_tarefa(to,pos->tarefa,1);
+
                                         }
 
                                 }
@@ -758,9 +791,9 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
         lista_task ante, then;
         lista_pessoas atual;
 
+        system("cls");
 
-
-        if(doing->next != NULL){
+        if(doing->next != NULL && geral->next != NULL){
 
                 printf("\nVer todas as tarefas atribuidas? [ 1- sim / 0 - nao ]\n->");
                 scanf("%d",&choice);
@@ -797,31 +830,22 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
                                 if(atual->p->mytasks->n < atual->p->max_task){
 
                                         desassocia_tarefa(then->tarefa);
+                                        elimina_no_task(doing,ante,then);
                                         then->tarefa->worker = atual->p;
                                         insere_tarefa(atual->p->mytasks,then->tarefa,0);
+                                        insere_tarefa(doing,then->tarefa,3);
 
                                 }else{
-
                                         printf("\nEste trabalhador já atingiu o limite maximo de tarefas.\n");
-
                                 }
-
                         }else{
-
                                 printf("\nAlgo esta errado. Tente novamente.\n\n");
-
                         }
-
                 }else{
-
                         printf("\nTarefa nao encontrada.\n");
-
                 }
-
         }else{
-
                 printf("\nSem tarefas atribuidas.\n");
-
         }
 
         printf("Pressione Enter para continuar... ");
