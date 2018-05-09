@@ -244,6 +244,7 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         Task *nova = (Task *)malloc(sizeof(Task));
         int comp;
+
         system("cls");
 
         printf("\n\n\tCriacao de Tarefa\n\n");
@@ -268,13 +269,26 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
         printf("Data de Criacao ");
         nova->inicio = set_data();
 
+        while(check_date_erros(nova->inicio)){
+                printf("Data de criacao ");
+                nova->inicio = set_data();
+        }
+
+
         printf("Prazo final ");
         nova->prazo = set_data();
+
+        while(check_date_erros(nova->prazo)){
+                printf("Prazo final ");
+                nova->prazo = set_data();
+
+        }
+
 
         comp = compare_date(nova->inicio,nova->prazo);
 
         while(comp == 1 || comp == 0){
-                printf("\nPrazo definido nao valido. Insira novamente.\n\n");
+                printf("\nPrazo definido nao excede a data de criacao. Insira novamente.\n\n");
                 printf("Prazo final ");
                 nova->prazo = set_data();
                 comp = compare_date(nova->inicio,nova->prazo);
@@ -315,7 +329,7 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
 
         else if(nova != NULL && then != NULL){
 
-                if(flag == 0){
+                if(flag == 0){ /* Ordenamento por ordem crescente de data de criação*/
 
                         while(compare_date(nova->inicio,then->tarefa->inicio) == 1 && then->next != NULL){
 
@@ -336,7 +350,8 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
 
                       }
 
-                }else if(flag == 1){
+                }
+                else if(flag == 1){ /* Ordenamento crescente por data de conclusao*/
 
                         while(compare_date(nova->fim,then->tarefa->fim) == 1 && then->next != NULL){
 
@@ -358,7 +373,8 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                       }
 
 
-                }else if(flag == 2){
+                }
+                else if(flag == 2){ /* Ordenamento decescente por prioridade */
 
                         while(nova->priority < then->tarefa->priority && then->next != NULL){
 
@@ -381,6 +397,7 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
 
 
                 }
+
         }
 
 }
@@ -603,23 +620,36 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
 
                                                 pos->tarefa->prazo = set_data();
 
+                                                while( check_date_erros(pos->tarefa->prazo)){
+                                                        printf("Prazo final ");
+                                                        pos->tarefa->prazo = set_data();
+                                                }
+
                                                 comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);  /*Teste de verificação de data*/
 
-                                                while(comp == 0 || comp == 1){
+                                                while((comp == 0 || comp == 1) && (trys != 3)){
                                                         printf("\nPrazo inserido nao valido. Tente novamente.\n\n");
                                                         printf("Novo Prazo final ");
                                                         pos->tarefa->prazo = set_data();
                                                         comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);
+                                                        trys++;
                                                 }
+                                                if(trys == 3){
+                                                        printf("\nExcedeu o numero maximo de tentativas para corrigir o erro.\n");
+                                                        printf("\nTodas as alteracoes serao revertidas.\n");
+                                                }
+
 
                                         }
 
                                         if(tipo == 2){
                                                 pos->tarefa->fim = NULL;
                                         }
+                                        if(trys != 3){
+                                                insere_tarefa(to,pos->tarefa,0);
+                                                elimina_no_task(from,ante,pos);
+                                        }
 
-                                        insere_tarefa(to,pos->tarefa,0);
-                                        elimina_no_task(from,ante,pos);
                                 }
                         }
                         else if(!passed){
@@ -656,36 +686,45 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                         printf("Data de conclusao ");
                                         pos->tarefa->fim = set_data();
 
+                                        while(check_date_erros(pos->tarefa->fim)){
+                                                printf("Data de conclusao ");
+                                                pos->tarefa->fim = set_data();
+                                        }
+
                                         comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
                                         comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
 
-                                                while(comp2 == 1 || comp == -1){
-                                                        printf("\nData de conclusao inserida nao valida. Tente novamente.\n\n");
-                                                        printf("Data de conclusao ");
-                                                        pos->tarefa->fim = set_data();
-                                                        comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
-                                                        comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
+                                        while(comp2 == 1 || comp == -1){
+                                                printf("\nData de conclusao inserida nao valida. Tente novamente.\n\n");
+                                                printf("Data de conclusao ");
+                                                pos->tarefa->fim = set_data();
+                                                comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
+                                                comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
+                                                trys++;
+                                        }
+                                        if(trys == 3){
+                                                printf("\nExcedeu o numero maximo de tentativas para corrigir o erro.\n");
+                                                printf("\nTodas as alteracoes serao revertidas.\n");
+                                        }else{
+                                                desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
+                                                insere_tarefa(to,pos->tarefa,1);
+                                        }
 
-                                                }
-
-
-                                        desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
-                                        insere_tarefa(to,pos->tarefa,1);
                                 }
 
                                 else if(tipo == 0){
                                         pos->tarefa->fim = NULL;
                                         insere_tarefa(to,pos->tarefa,2);
                                 }
-
-                                elimina_no_task(from,ante,pos);
+                                if(trys != 3){
+                                        elimina_no_task(from,ante,pos);
+                                }
 
                         }else{
                                 printf("\nAlgo correu mal. Tente novamente.\n\n");
                         }
 
                 }
-
 
         }
 
@@ -787,5 +826,18 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
 
         printf("Pressione Enter para continuar... ");
         getchar();
+
+}
+
+int check_date_erros(Data *data){ /*Detecao de erros em datas*/
+
+        int error = 0;
+
+         if( (data->dia <= 0 || data->dia > 31) || (data->mes <= 0 || data->mes > 12) || (data->dia > 29 && data->mes == 4 && data->ano % 4 == 0) || (data->dia > 28 && data->mes == 4 && data->ano % 4 != 0)){
+                printf("\nData introduzida nao valida. Insira novamente.\n\n");
+                error = 1;
+        }
+
+        return error;
 
 }

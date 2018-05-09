@@ -95,4 +95,6 @@ int compare_date(Data *d1, Data *d2);
 
 void switch_worker(lista_task doing , lista_pessoas geral);
 
+int check_date_erros(Data *data);
+
 #endif
