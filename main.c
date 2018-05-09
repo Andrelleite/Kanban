@@ -1,8 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "header.h"
 
+#define BUFFER 100
 
+
+void running(lista_pessoas P_Lista){
+
+        upload_info(P_Lista);
+        system("cls");
+        printf("\n\n\n\n\n\n\t\t _________________________________\n");
+        printf("\t\t|_________________________________|\n\t\t|________PROJETO PPP 2018_________|\n\t\t|_________________________________|\n");
+        printf("\t\t|_________________________________|\n\t\t|______KANBAN TASK MANAGEMENT_____|\n\t\t|_________________________________|\n");
+
+        printf("\n\n\t\t\t    Andre Leite\n\n\t\t\t         e\n\n\t\t\t   Ana Goncalves");
+
+        printf("\n\n\n\n\t\t  Pressione Enter para continuar...");
+        getchar();
+
+}
 
 void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task Doing, lista_task Done){
 
@@ -147,19 +164,18 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
         }
 }
 
-
 int main(){
 
         lista_pessoas P_Lista = cria_lista_pessoas();
         lista_task T_Lista = cria_lista_tarefas();
-        lista_task Todo_List = cria_lista_tarefas(); /*Todo Section*/
-        lista_task Doing_List = cria_lista_tarefas(); /*Doing Section*/
-        lista_task Done_List = cria_lista_tarefas(); /*Done Section*/
+        lista_task Todo_List = cria_lista_tarefas();
 
-       menu(P_Lista, T_Lista, Todo_List, Doing_List, Done_List);
-       /*FILE *fich = fopen("workers.txt","w");
-        fprintf(fich, "I love cheese");*/
+        lista_task Doing_List = cria_lista_tarefas();
+        lista_task Done_List = cria_lista_tarefas();
 
+        running(P_Lista);
+
+        menu(P_Lista, T_Lista, Todo_List, Doing_List, Done_List);
 
         return 0;
 }

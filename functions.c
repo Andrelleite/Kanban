@@ -55,8 +55,6 @@ void insere_pessoa(lista_pessoas lista){ /* Inserção de uma pessoa numa lista li
         Pessoa *nova = cria_pessoa(lista);
         lista_pessoas no = (lista_pessoas)malloc(sizeof(P_Node));
 
-
-
         no->p = nova;
         no->n = 0;
 
@@ -394,11 +392,10 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                                 then->next = no;
 
                       }
-                      else if (nova->priority == then->tarefa->priority){
+                      else if (nova->priority == then->tarefa->priority){ /*Ordenamento crescente de data de criacao para prioridades iguais */
 
 
                                 while( compare_date(nova->prazo , then->tarefa->prazo) == 1 && (nova->priority == then->tarefa->priority) && (then->next != NULL )){
-                                        printf("Che");
                                         ante = then;
                                         then = then->next;
 
@@ -441,10 +438,6 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                 }
 
         }
-
-
-        printf("");
-        getchar();
 
 }
 
@@ -852,7 +845,6 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
                         if(found){
 
                                 if(atual->p->mytasks->n < atual->p->max_task){
-
                                         desassocia_tarefa(then->tarefa);
                                         elimina_no_task(doing,ante,then);
                                         then->tarefa->worker = atual->p;
@@ -889,3 +881,86 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
         return error;
 
 }
+
+void upload_workers(Pessoa *nova, lista_pessoas lista){
+
+        lista_pessoas no = (lista_pessoas)malloc(sizeof(P_Node));
+        no->p = nova;
+        no->n = 0;
+
+         if(lista != NULL){
+
+                lista->n++;
+                no->next = lista->next;
+                lista->next = no;
+
+        }
+
+}
+
+void upload_info(lista_pessoas P_Lista){
+
+        int i , j;
+        int max_t;
+        FILE *file = fopen("workers.txt","r");
+        char *p, *q;
+        char *line = (char *)malloc(100*sizeof(char));
+        char temp[100];
+        char *name;
+        Pessoa *nova;
+
+        printf("\n\n____LOADING INFORMATION____\n\n");
+
+        if(file == NULL){
+                printf("ERROR.");
+                exit(1);
+        }
+
+        printf("Maximo de tarefas por trabalhador: ");
+        scanf("%d",&max_t);
+        getchar();
+        printf("\n");
+
+        while(fgets(line,100,file) != NULL){
+                p = line;
+                j = 0;
+                nova = (Pessoa *)malloc(sizeof(Pessoa));
+                while(*p != '\n' && *p != '\0'){
+                        q = temp;
+                        i = 0;
+                        while( *p != ','){
+                                *q = *p;
+                                q++;
+                                p++;
+                                i++;
+                        }
+                        name =  (char *)malloc(i * sizeof(char));
+                        sprintf(name,"%s",temp);
+
+                        if( j == 0 ){
+                                nova->nome = (char *)malloc(i*sizeof(char));
+                                sprintf(nova->nome,"%s",name);
+                        }else if(j == 1){
+                                nova->idade = atoi(name);
+                        }else if(j == 2){
+                                nova->mail = (char *)malloc(i*sizeof(char));
+                                sprintf(nova->mail,"%s",name);
+                        }else if(j == 3){
+                                nova->id = atoi(name);
+                        }
+                        j++;
+                        free(name);
+                        memset(temp, 0, sizeof(temp));
+                        p++;
+                }
+                nova->mytasks = (lista_task)malloc(sizeof(Node));
+                nova->max_task = max_t;
+                upload_workers(nova,P_Lista);
+
+        }
+        imprime_lista_pessoas(P_Lista);
+        fclose(file);
+
+
+}
+

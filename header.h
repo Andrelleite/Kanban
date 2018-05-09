@@ -97,4 +97,8 @@ void switch_worker(lista_task doing , lista_pessoas geral);
 
 int check_date_erros(Data *data);
 
+void upload_info(lista_pessoas P_Lista);
+
+void upload_workers(Pessoa *nova, lista_pessoas lista);
+
 #endif
