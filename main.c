@@ -13,9 +13,7 @@ void running(lista_pessoas P_Lista){
         printf("\n\n\n\n\n\n\t\t _________________________________\n");
         printf("\t\t|_________________________________|\n\t\t|________PROJETO PPP 2018_________|\n\t\t|_________________________________|\n");
         printf("\t\t|_________________________________|\n\t\t|______KANBAN TASK MANAGEMENT_____|\n\t\t|_________________________________|\n");
-
         printf("\n\n\t\t\t    Andre Leite\n\n\t\t\t         e\n\n\t\t\t   Ana Goncalves");
-
         printf("\n\n\n\n\t\t  Pressione Enter para continuar...");
         getchar();
 

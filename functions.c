@@ -108,6 +108,8 @@ Pessoa *cria_pessoa(lista_pessoas lista){ /* Criar uma pessoa/trabalhador em mem
 
         novo->mytasks = cria_lista_tarefas();
 
+        put_on_text(novo);
+
         printf("Pressione Enter para continuar... ");
         getchar();
 
@@ -226,7 +228,7 @@ void worker_info(lista_pessoas lista){ /* Obter informação de um trabalhador */
                 scanf("%d",&choice);
                 getchar();
                 if(choice){
-                        printf("\n      Worker %s\t ID: %d \n",p->nome,p->id);
+                        printf("\n      Worker %s\n\t ID: %d \n",p->nome,p->id);
                         imprime_lista_tarefas(p->mytasks);
                 }
 
@@ -934,6 +936,7 @@ void upload_info(lista_pessoas P_Lista){
                                 p++;
                                 i++;
                         }
+                        printf("%d\n",i);
                         name =  (char *)malloc(i * sizeof(char));
                         sprintf(name,"%s",temp);
 
@@ -953,7 +956,7 @@ void upload_info(lista_pessoas P_Lista){
                         memset(temp, 0, sizeof(temp));
                         p++;
                 }
-                nova->mytasks = (lista_task)malloc(sizeof(Node));
+                nova->mytasks = cria_lista_tarefas();
                 nova->max_task = max_t;
                 upload_workers(nova,P_Lista);
 
@@ -964,3 +967,32 @@ void upload_info(lista_pessoas P_Lista){
 
 }
 
+void put_on_text(Pessoa *worker){
+
+        FILE *file = fopen("workers.txt","a");
+        char vec[100];
+        char idade[3];
+        char  id[10];
+
+        char *pos;
+        if ((pos=strchr(worker->nome, '\n')) != NULL)
+                *pos = '\0';
+        if ((pos=strchr(worker->mail, '\n')) != NULL)
+                *pos = '\0';
+
+        sprintf(idade, "%d", worker->idade);
+        sprintf(id, "%d", worker->id);
+
+
+        strcpy(vec,worker->nome);
+        strcat(vec,",");
+        strcat(vec,idade);
+        strcat(vec,",");
+        strcat(vec,worker->mail);
+        strcat(vec,",");
+        strcat(vec,id);
+        strcat(vec,",\n");
+        fwrite(vec,sizeof(char),strlen(vec),file);
+
+        fclose(file);
+}

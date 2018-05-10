@@ -101,4 +101,8 @@ void upload_info(lista_pessoas P_Lista);
 
 void upload_workers(Pessoa *nova, lista_pessoas lista);
 
+void put_on_text(Pessoa *worker);
+
+int check_id(Pessoa *p, lista_pessoas lista);
+
 #endif
