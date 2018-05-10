@@ -12,7 +12,7 @@
 
         GitHub -> https://github.com/Andrelleite
 
-        n of functions : 18
+        n of functions : 22
         voids : 8
         Task* : 1
         Pessoa* : 1
@@ -40,7 +40,7 @@ lista_pessoas cria_lista_pessoas(){ /* Função para inicializar uma lista de pess
 
         lista_pessoas novo = (lista_pessoas)malloc(sizeof(P_Node));
         if(novo != NULL){
-
+                novo->n_task = 1;
                 novo->n = 0 ;
                 novo->next = NULL;
                 novo->p = NULL;
@@ -911,18 +911,13 @@ void upload_info(lista_pessoas P_Lista){
         char *name;
         Pessoa *nova;
 
-        printf("\n\n____LOADING INFORMATION____\n\n");
+        printf("\n\n____  LOADING INFORMATION ____\n\n");
 
         if(file == NULL){
                 printf("ERROR.");
                 exit(1);
         }
-
-        printf("Maximo de tarefas por trabalhador: ");
-        scanf("%d",&max_t);
-        getchar();
-        printf("\n");
-
+        max_t = P_Lista->n_task;
         while(fgets(line,100,file) != NULL){
                 p = line;
                 j = 0;
@@ -936,7 +931,6 @@ void upload_info(lista_pessoas P_Lista){
                                 p++;
                                 i++;
                         }
-                        printf("%d\n",i);
                         name =  (char *)malloc(i * sizeof(char));
                         sprintf(name,"%s",temp);
 
@@ -995,4 +989,25 @@ void put_on_text(Pessoa *worker){
         fwrite(vec,sizeof(char),strlen(vec),file);
 
         fclose(file);
+}
+
+void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista){
+
+        FILE *todo = fopen("Todo.txt","wb");
+        FILE *doing = fopen("Doing.txt","wb");
+        FILE *done = fopen("Done.txt","wb");
+        FILE *all = fopen("Tasks.txt","wb");
+
+        lista_task ptr;
+
+        ptr = Todo;
+
+        while(ptr != NULL){
+
+                fwrite(&ptr, sizeof(lista_task), 1 , todo);
+                ptr = ptr->next;
+
+        }
+
+
 }

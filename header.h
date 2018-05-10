@@ -52,6 +52,7 @@ typedef struct node{ /* Lista ligada para tarefas*/
 typedef struct person_node{ /*Lista ligada para pessoas */
 
         int n;
+        int n_task;
         Pessoa *p;
         lista_pessoas next;
 
@@ -104,5 +105,8 @@ void upload_workers(Pessoa *nova, lista_pessoas lista);
 void put_on_text(Pessoa *worker);
 
 int check_id(Pessoa *p, lista_pessoas lista);
+
+void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista);
+
 
 #endif

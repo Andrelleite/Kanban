@@ -3,10 +3,17 @@
 #include <string.h>
 #include "header.h"
 
-#define BUFFER 100
-
-
 void running(lista_pessoas P_Lista){
+
+        FILE *file = fopen("Todo.txt","rb");
+        lista_task ptr = (lista_task)malloc(sizeof(Node));
+
+        if (file == NULL)
+        {
+                fprintf(stderr, "\nError opening file\n");
+                exit (1);
+        }
+
 
         upload_info(P_Lista);
         system("cls");
@@ -14,8 +21,11 @@ void running(lista_pessoas P_Lista){
         printf("\t\t|_________________________________|\n\t\t|________PROJETO PPP 2018_________|\n\t\t|_________________________________|\n");
         printf("\t\t|_________________________________|\n\t\t|______KANBAN TASK MANAGEMENT_____|\n\t\t|_________________________________|\n");
         printf("\n\n\t\t\t    Andre Leite\n\n\t\t\t         e\n\n\t\t\t   Ana Goncalves");
+
         printf("\n\n\n\n\t\t  Pressione Enter para continuar...");
         getchar();
+
+
 
 }
 
@@ -155,6 +165,7 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                         menu(P_Lista,T_Lista,Todo,Doing,Done);
                         break;
                 case 0:
+                        put_on_bin(Todo,Doing,Done,T_Lista);
                         printf("**Toda a informacao foi guardada em ficheiros **\n");
                         break;
                 default:
