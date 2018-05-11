@@ -102,11 +102,10 @@ void upload_info(lista_pessoas P_Lista);
 
 void upload_workers(Pessoa *nova, lista_pessoas lista);
 
-void put_on_text(Pessoa *worker);
+void put_on_text(lista_pessoas lista);
 
-int check_id(Pessoa *p, lista_pessoas lista);
+int check_id(lista_pessoas per, lista_pessoas atual, lista_pessoas lista);
 
 void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista);
-
 
 #endif

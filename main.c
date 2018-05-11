@@ -5,14 +5,6 @@
 
 void running(lista_pessoas P_Lista){
 
-        FILE *file = fopen("Todo.txt","rb");
-        lista_task ptr = (lista_task)malloc(sizeof(Node));
-
-        if (file == NULL)
-        {
-                fprintf(stderr, "\nError opening file\n");
-                exit (1);
-        }
 
 
         upload_info(P_Lista);
@@ -24,7 +16,6 @@ void running(lista_pessoas P_Lista){
 
         printf("\n\n\n\n\t\t  Pressione Enter para continuar...");
         getchar();
-
 
 
 }
@@ -165,8 +156,10 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                         menu(P_Lista,T_Lista,Todo,Doing,Done);
                         break;
                 case 0:
+                        put_on_text(P_Lista);
                         put_on_bin(Todo,Doing,Done,T_Lista);
                         printf("**Toda a informacao foi guardada em ficheiros **\n");
+                        printf("**E possivel que alguma informacao tenha sofrido alteracoes para corrigir erros de input em ficheiros.**\n");
                         break;
                 default:
                         menu(P_Lista, T_Lista,Todo,Doing,Done);

@@ -72,7 +72,7 @@ Pessoa *cria_pessoa(lista_pessoas lista){ /* Criar uma pessoa/trabalhador em mem
 
         Pessoa *novo = (Pessoa *)malloc(sizeof(Pessoa));
 
-        novo->nome = (char *)malloc(10 * sizeof(char));
+        novo->nome = (char *)malloc(15 * sizeof(char));
         novo->mail = (char *)malloc(30 * sizeof(char));
 
         system("cls");
@@ -107,8 +107,6 @@ Pessoa *cria_pessoa(lista_pessoas lista){ /* Criar uma pessoa/trabalhador em mem
 
 
         novo->mytasks = cria_lista_tarefas();
-
-        put_on_text(novo);
 
         printf("Pressione Enter para continuar... ");
         getchar();
@@ -887,14 +885,44 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
 void upload_workers(Pessoa *nova, lista_pessoas lista){
 
         lista_pessoas no = (lista_pessoas)malloc(sizeof(P_Node));
+        lista_pessoas act = lista->next;
+        lista_pessoas then = lista;
+
         no->p = nova;
         no->n = 0;
 
-         if(lista != NULL){
+        if(lista->next == NULL){
 
                 lista->n++;
                 no->next = lista->next;
                 lista->next = no;
+
+        }
+         else{
+
+                while(act->next != NULL && no->p->id > act->p->id){
+
+                        then = act;
+                        act = act->next;
+
+                }
+
+                if(no->p->id < act->p->id){
+                        lista->n++;
+                        then->next = no;
+                        no->next = act;
+
+                }else if(no->p->id == act->p->id){
+
+                        check_id(no,act,lista);
+
+                }else{
+                        lista->n++;
+                        no->next = act->next;
+                        act->next = no;
+                }
+
+
 
         }
 
@@ -906,9 +934,8 @@ void upload_info(lista_pessoas P_Lista){
         int max_t;
         FILE *file = fopen("workers.txt","r");
         char *p, *q;
-        char *line = (char *)malloc(100*sizeof(char));
+        char line[100];
         char temp[100];
-        char *name;
         Pessoa *nova;
 
         printf("\n\n____  LOADING INFORMATION ____\n\n");
@@ -917,11 +944,15 @@ void upload_info(lista_pessoas P_Lista){
                 printf("ERROR.");
                 exit(1);
         }
+
         max_t = P_Lista->n_task;
-        while(fgets(line,100,file) != NULL){
+
+        while( fgets(line,100,file) != NULL ){
+
                 p = line;
                 j = 0;
                 nova = (Pessoa *)malloc(sizeof(Pessoa));
+
                 while(*p != '\n' && *p != '\0'){
                         q = temp;
                         i = 0;
@@ -931,22 +962,18 @@ void upload_info(lista_pessoas P_Lista){
                                 p++;
                                 i++;
                         }
-                        name =  (char *)malloc(i * sizeof(char));
-                        sprintf(name,"%s",temp);
-
                         if( j == 0 ){
                                 nova->nome = (char *)malloc(i*sizeof(char));
-                                sprintf(nova->nome,"%s",name);
+                                sprintf(nova->nome,"%s",temp);
                         }else if(j == 1){
-                                nova->idade = atoi(name);
+                                nova->idade = atoi(temp);
                         }else if(j == 2){
                                 nova->mail = (char *)malloc(i*sizeof(char));
-                                sprintf(nova->mail,"%s",name);
+                                sprintf(nova->mail,"%s",temp);
                         }else if(j == 3){
-                                nova->id = atoi(name);
+                                nova->id = atoi(temp);
                         }
                         j++;
-                        free(name);
                         memset(temp, 0, sizeof(temp));
                         p++;
                 }
@@ -961,53 +988,73 @@ void upload_info(lista_pessoas P_Lista){
 
 }
 
-void put_on_text(Pessoa *worker){
+void put_on_text(lista_pessoas lista){
 
-        FILE *file = fopen("workers.txt","a");
-        char vec[100];
-        char idade[3];
-        char  id[10];
-
+        FILE *file = fopen("workers.txt","w");
         char *pos;
-        if ((pos=strchr(worker->nome, '\n')) != NULL)
-                *pos = '\0';
-        if ((pos=strchr(worker->mail, '\n')) != NULL)
-                *pos = '\0';
+        lista_pessoas act = lista->next;
+        Pessoa *worker;
 
-        sprintf(idade, "%d", worker->idade);
-        sprintf(id, "%d", worker->id);
+        while(act != NULL){
+
+                worker = act->p;
 
 
-        strcpy(vec,worker->nome);
-        strcat(vec,",");
-        strcat(vec,idade);
-        strcat(vec,",");
-        strcat(vec,worker->mail);
-        strcat(vec,",");
-        strcat(vec,id);
-        strcat(vec,",\n");
-        fwrite(vec,sizeof(char),strlen(vec),file);
+                if ((pos=strchr(worker->nome, '\n')) != NULL)
+                        *pos = '\0';
+                if ((pos=strchr(worker->mail, '\n')) != NULL)
+                        *pos = '\0';
+
+
+                fprintf(file,"%s,%d,%s,%d,\n",worker->nome,worker->idade,worker->mail,worker->id);
+
+                act = act->next;
+
+        }
+
+
 
         fclose(file);
 }
 
 void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista){
 
-        FILE *todo = fopen("Todo.txt","wb");
-        FILE *doing = fopen("Doing.txt","wb");
-        FILE *done = fopen("Done.txt","wb");
-        FILE *all = fopen("Tasks.txt","wb");
 
-        lista_task ptr;
 
-        ptr = Todo;
+}
 
-        while(ptr != NULL){
+int check_id(lista_pessoas per, lista_pessoas atual, lista_pessoas lista){
 
-                fwrite(&ptr, sizeof(lista_task), 1 , todo);
-                ptr = ptr->next;
+        lista_pessoas then = atual;
+        lista_pessoas act = then->next;
+        per->p->id++;
+
+        while( (per->p->id > act->p->id || per->p->id == act->p->id) && act->next != NULL){
+
+                per->p->id++;
+                then = act;
+                act = act->next;
 
         }
+
+        if(per->p->id == act->p->id){
+                per->p->id++;
+                lista->n++;
+                per->next = act->next;
+                act->next = per;
+        }
+        else if(per->p->id < act->p->id){
+                lista->n++;
+                per->next = act;
+                then->next = per;
+        }
+
+        else if(per->p->id > act->p->id  ){
+                lista->n++;
+                per->next = act->next;
+                act->next = per;
+        }
+
 
 
 }
