@@ -1,5 +1,2 @@
-Patricia Vieira,21,vitixa@outlook.com,1,
-Andre Leite,20,leiteandre4@gmail.com,2,
-Jose luis,23,diddz50@gmail.com,4,
-Karl Marx,52,communist@hotmail.com,203,
-Adolf Hitler,55,nazi@outlook.com,5,
+Andre Leite,21,leiteandre4@gmail.com,1,
+Zeca Pagodingo,34,zeca@gmail.com,2,

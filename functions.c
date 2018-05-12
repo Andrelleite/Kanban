@@ -12,7 +12,7 @@
 
         GitHub -> https://github.com/Andrelleite
 
-        n of functions : 22
+        n of functions : 24
         voids : 8
         Task* : 1
         Pessoa* : 1
@@ -1055,6 +1055,6 @@ int check_id(lista_pessoas per, lista_pessoas atual, lista_pessoas lista){
                 act->next = per;
         }
 
-
+        return 0;
 
 }
