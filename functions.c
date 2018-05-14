@@ -10,14 +10,14 @@
         e até mesmo chamadas pelas outras funções, de modo a tornar o código mais eficiente, mais versátil e mais leve. É importante manter um código bem estruturado para que a sua
         manutenção seja fácil
 
-        GitHub -> https://github.com/Andrelleite
+        GitHub -> https://github.com//Andrelleite
 
         n of functions : 24
-        voids : 8
+        voids : 13
         Task* : 1
         Pessoa* : 1
         Data* :  1
-        int: 4
+        int: 6
 
 **/
 
@@ -764,6 +764,7 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
 
                                 else if(tipo == 0){
                                         pos->tarefa->fim = NULL;
+                                        desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
                                         insere_tarefa(to,pos->tarefa,2);
                                 }
                                 if(trys != 3){
@@ -873,7 +874,7 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
 
         int error = 0;
 
-         if( (data->dia <= 0 || data->dia > 31) || (data->mes <= 0 || data->mes > 12) || (data->dia > 29 && data->mes == 4 && data->ano % 4 == 0) || (data->dia > 28 && data->mes == 4 && data->ano % 4 != 0)){
+         if( (data->dia <= 0 || data->dia > 31) || (data->mes <= 0 || data->mes > 12) || (data->dia > 29 && data->mes == 2 && data->ano % 4 == 0) || (data->dia > 28 && data->mes == 2 && data->ano % 4 != 0)){
                 printf("\nData introduzida nao valida. Insira novamente.\n\n");
                 error = 1;
         }
@@ -882,7 +883,7 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
 
 }
 
-void upload_workers(Pessoa *nova, lista_pessoas lista){
+void upload_workers(Pessoa *nova, lista_pessoas lista){ /* carregamento de trabalhadores em ficheiro */
 
         lista_pessoas no = (lista_pessoas)malloc(sizeof(P_Node));
         lista_pessoas act = lista->next;
@@ -928,7 +929,7 @@ void upload_workers(Pessoa *nova, lista_pessoas lista){
 
 }
 
-void upload_info(lista_pessoas P_Lista){
+void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em ficheiro */
 
         int i , j;
         int max_t;
@@ -988,7 +989,7 @@ void upload_info(lista_pessoas P_Lista){
 
 }
 
-void put_on_text(lista_pessoas lista){
+void put_on_text(lista_pessoas lista){ /* escreve informacao em ficheiro*/
 
         FILE *file = fopen("workers.txt","w");
         char *pos;
@@ -1017,13 +1018,13 @@ void put_on_text(lista_pessoas lista){
         fclose(file);
 }
 
-void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista){
+void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista){ /* escreve em ficheiro binario */
 
 
 
 }
 
-int check_id(lista_pessoas per, lista_pessoas atual, lista_pessoas lista){
+int check_id(lista_pessoas per, lista_pessoas atual, lista_pessoas lista){ /* verficacao de id de trabalhadores */
 
         lista_pessoas then = atual;
         lista_pessoas act = then->next;
