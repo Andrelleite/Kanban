@@ -164,6 +164,8 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                 default:
                         menu(P_Lista, T_Lista,Todo,Doing,Done);
         }
+
+
 }
 
 int main(){
