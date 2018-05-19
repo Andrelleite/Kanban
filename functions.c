@@ -6,6 +6,16 @@
 
 /**
 
+        LEFT:
+                Restrição de uma tarefa por semana
+                Mudar prioridade durante a aplicação X
+                Escrever tarefas em ficheiro
+                dar id da pessoa à tarefa X
+                Atribuir fase em numero À tarefa X
+
+
+
+
         Todas as funções têm um papel fulcral, sendo que existem algumas que se tornam preponderantes na implementação deste código, uma vez que são utilizadas constantemente
         e até mesmo chamadas pelas outras funções, de modo a tornar o código mais eficiente, mais versátil e mais leve. É importante manter um código bem estruturado para que a sua
         manutenção seja fácil
@@ -295,7 +305,8 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         nova->fim = NULL;
         nova->worker = NULL;
-
+        nova->personId= 0;
+        nova->fase = 1;
         printf("ID: %d\n", nova->id);
 
         printf("Pressione Enter para continuar... ");
@@ -395,17 +406,17 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                       else if (nova->priority == then->tarefa->priority){ /*Ordenamento crescente de data de criacao para prioridades iguais */
 
 
-                                while( compare_date(nova->prazo , then->tarefa->prazo) == 1 && (nova->priority == then->tarefa->priority) && (then->next != NULL )){
+                                while( compare_date(nova->inicio , then->tarefa->inicio) == 1 && (nova->priority == then->tarefa->priority) && (then->next != NULL )){
                                         ante = then;
                                         then = then->next;
 
                                 }
 
-                                if(compare_date(nova->prazo,then->tarefa->prazo) == 1){
+                                if(compare_date(nova->inicio,then->tarefa->inicio) == 1){
                                         no->next = then->next;
                                         then->next = no;
                                 }
-                                else if(compare_date(nova->prazo , then->tarefa->prazo) != 1 ){
+                                else if(compare_date(nova->inicio , then->tarefa->inicio) != 1 ){
 
                                         ante->next = no;
                                         no->next = then;
@@ -456,7 +467,7 @@ void imprime_lista_tarefas(lista_task lista){ /* Fazer diplay de TODAS as tarefa
                 printf("__________________________________________________\n\n");
                 while(act != NULL){
                         tarefa = act->tarefa;
-
+                        printf("Fase em Kankan: %d\n",tarefa->fase);
                         printf("Descricao: %s",tarefa->descricao);
                         printf("Prioridade: %d\n",tarefa->priority);
                         printf("ID tarefa: %d\n",tarefa->id);
@@ -475,10 +486,16 @@ void imprime_lista_tarefas(lista_task lista){ /* Fazer diplay de TODAS as tarefa
                                 printf(" | Data de fim: %d/%d/%d\n",tarefa->fim->dia,tarefa->fim->mes,tarefa->fim->ano);
                         }
 
+                        if(tarefa->personId == 0 ){
+                                printf("Id de trabalhado: (nao atribuido) \n");
+                        }else{
+                                printf("Id de trabalhado: %d \n",tarefa->personId);
+                        }
+
                        if(tarefa->worker == NULL){
                                 printf("Trabalhador encarregue: (ainda sem trabalhador)\n");
                         }else{
-                                printf("Trabalhador encarregue: %s | ID trabalhador: %d\n",tarefa->worker->nome,tarefa->worker->id);
+                                printf("Trabalhador encarregue: %s \n",tarefa->worker->nome);
                         }
                         printf("__________________________________________________\n\n");
                         act = act->next;
@@ -556,6 +573,7 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
                         if(task->tarefa->worker == NULL){
                                 insere_tarefa(act->p->mytasks,task->tarefa,0);
                                 task->tarefa->worker = act->p;
+                                task->tarefa->personId=act->p->id;
                                 passed = 1;
                         }
                         else if(task->tarefa->worker->id == act->p->id){
@@ -606,7 +624,7 @@ void desassocia_tarefa(Task *task){ /* Função principal para desassociar uma tar
         if(found){
                 elimina_no_task(task->worker->mytasks,ante,pos);
                 task->worker = NULL;
-
+                task->personId = 0;
                 printf("\nTarefa desassociada com sucesso.\n\n");
         }else{
 
@@ -620,7 +638,7 @@ void desassocia_tarefa(Task *task){ /* Função principal para desassociar uma tar
 
 }
 
-void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo){ /*Passagem de tarefas para sectores de KANBAN */
+void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo, int fase){ /*Passagem de tarefas para sectores de KANBAN */
 
         int id, found, comp, comp2;
         int trys = 0;
@@ -684,6 +702,7 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                                 pos->tarefa->fim = NULL;
                                         }
                                         if(trys != 3){
+                                                pos->tarefa->fase = fase;
                                                 insere_tarefa(to,pos->tarefa,3);
                                                 elimina_no_task(from,ante,pos);
                                         }
@@ -750,6 +769,7 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                                         printf("\nTodas as alteracoes serao revertidas.\n");
                                                 }else{
                                                         desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
+                                                        pos->tarefa->fase = fase;
                                                         insere_tarefa(to,pos->tarefa,1);
                                                 }
 
@@ -764,6 +784,7 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
 
                                 else if(tipo == 0){
                                         pos->tarefa->fim = NULL;
+                                        pos->tarefa->fase = fase;
                                         desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
                                         insere_tarefa(to,pos->tarefa,2);
                                 }
@@ -776,7 +797,6 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                         }
 
                 }
-
         }
 
 
@@ -849,6 +869,7 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
                                         desassocia_tarefa(then->tarefa);
                                         elimina_no_task(doing,ante,then);
                                         then->tarefa->worker = atual->p;
+                                        then->tarefa->personId = atual->p->id;
                                         insere_tarefa(atual->p->mytasks,then->tarefa,0);
                                         insere_tarefa(doing,then->tarefa,3);
 
@@ -883,15 +904,13 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
 
 }
 
-void upload_workers(Pessoa *nova, lista_pessoas lista){ /* carregamento de trabalhadores em ficheiro */
+void upload_workers(Pessoa *nova, lista_pessoas lista, lista_pessoas rep){ /* carregamento de trabalhadores em ficheiro */
 
         lista_pessoas no = (lista_pessoas)malloc(sizeof(P_Node));
         lista_pessoas act = lista->next;
         lista_pessoas then = lista;
-
         no->p = nova;
         no->n = 0;
-
         if(lista->next == NULL){
 
                 lista->n++;
@@ -902,12 +921,9 @@ void upload_workers(Pessoa *nova, lista_pessoas lista){ /* carregamento de traba
          else{
 
                 while(act->next != NULL && no->p->id > act->p->id){
-
                         then = act;
                         act = act->next;
-
                 }
-
                 if(no->p->id < act->p->id){
                         lista->n++;
                         then->next = no;
@@ -915,15 +931,60 @@ void upload_workers(Pessoa *nova, lista_pessoas lista){ /* carregamento de traba
 
                 }else if(no->p->id == act->p->id){
 
-                        check_id(no,act,lista);
+                        no->next = rep->next;
+                        rep->next =no;
 
                 }else{
                         lista->n++;
                         no->next = act->next;
                         act->next = no;
                 }
+        }
 
+}
 
+void correct_id(lista_pessoas lista, lista_pessoas rep){
+
+        lista_pessoas ante;
+        lista_pessoas post;
+        lista_pessoas act = rep->next;
+        int done = 1;
+
+        while(act !=NULL){
+                ante = lista->next;
+                post = ante->next;
+                while(done != 0 && post->next != NULL){
+                        if(act->p->id == post->p->id){
+                                act->p->id++;
+                                ante = post;
+                                post = post->next;
+                        }else if(act->p->id > post->p->id){
+                                ante = post;
+                                post = post->next;
+                        }else{
+                                rep->next = act->next;
+                                ante->next = act;
+                                act->next = post;
+                                done = 0;
+                        }
+                }
+                if(post->next == NULL && done != 0){
+                       if(act->p->id == post->p->id){
+                                rep->next = act->next;
+                                act->p->id++;
+                                act->next = post->next;
+                                post->next = act;
+                        }else if(act->p->id > post->p->id){
+                                rep->next = act->next;
+                                act->next = post->next;
+                                post->next = act;
+                        }else{
+                                rep->next = act->next;
+                                ante->next = act;
+                                act->next = post;
+                        }
+                }
+                act = rep->next;
 
         }
 
@@ -938,6 +999,7 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
         char line[100];
         char temp[100];
         Pessoa *nova;
+        lista_pessoas repetidos = cria_lista_pessoas();
 
         printf("\n\n____  LOADING INFORMATION ____\n\n");
 
@@ -980,9 +1042,10 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
                 }
                 nova->mytasks = cria_lista_tarefas();
                 nova->max_task = max_t;
-                upload_workers(nova,P_Lista);
+                upload_workers(nova,P_Lista,repetidos);
 
         }
+        correct_id(P_Lista,repetidos);
         imprime_lista_pessoas(P_Lista);
         fclose(file);
 
@@ -1024,38 +1087,4 @@ void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T
 
 }
 
-int check_id(lista_pessoas per, lista_pessoas atual, lista_pessoas lista){ /* verficacao de id de trabalhadores */
 
-        lista_pessoas then = atual;
-        lista_pessoas act = then->next;
-        per->p->id++;
-
-        while( (per->p->id > act->p->id || per->p->id == act->p->id) && act->next != NULL){
-
-                per->p->id++;
-                then = act;
-                act = act->next;
-
-        }
-
-        if(per->p->id == act->p->id){
-                per->p->id++;
-                lista->n++;
-                per->next = act->next;
-                act->next = per;
-        }
-        else if(per->p->id < act->p->id){
-                lista->n++;
-                per->next = act;
-                then->next = per;
-        }
-
-        else if(per->p->id > act->p->id  ){
-                lista->n++;
-                per->next = act->next;
-                act->next = per;
-        }
-
-        return 0;
-
-}

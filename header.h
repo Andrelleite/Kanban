@@ -32,6 +32,8 @@ typedef struct pessoa{ /*estrutura para trabalhadores*/
 typedef struct task{ /*estrutura para tarefas*/
 
         int id;
+        int personId;
+        int fase;
         int priority;
         Data *inicio;
         Data *fim;
@@ -90,7 +92,7 @@ void elimina_no_task(lista_task tarefa, lista_task ant, lista_task act);
 
 void desassocia_tarefa(Task *task);
 
-void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo);
+void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int flag, int tipo, int fase);
 
 int compare_date(Data *d1, Data *d2);
 
@@ -100,11 +102,11 @@ int check_date_erros(Data *data);
 
 void upload_info(lista_pessoas P_Lista);
 
-void upload_workers(Pessoa *nova, lista_pessoas lista);
+void upload_workers(Pessoa *nova, lista_pessoas lista, lista_pessoas rep);
 
 void put_on_text(lista_pessoas lista);
 
-int check_id(lista_pessoas per, lista_pessoas atual, lista_pessoas lista);
+int check_order(lista_pessoas lista);
 
 void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista);
 
