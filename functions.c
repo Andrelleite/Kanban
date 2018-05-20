@@ -8,7 +8,6 @@
 
         LEFT:
                 Restrição de uma tarefa por semana
-                ler tarefas do ficheiro
 
 
         Todas as funções têm um papel fulcral, sendo que existem algumas que se tornam preponderantes na implementação deste código, uma vez que são utilizadas constantemente
@@ -25,6 +24,15 @@
         int: 6
 
 **/
+
+
+/*******************************************************************
+*
+*                                               APLICATION OPERATION SECTION
+*
+********************************************************************/
+
+
 
 lista_task cria_lista_tarefas(){ /* Função para inicializar a lista de tarefas*/
 
@@ -153,7 +161,7 @@ int get_worker(lista_pessoas lista, lista_pessoas *act, int id){ /* obter um tra
 
         if(lista->next == NULL){
                 printf("    (Sem trabalhadores)\n\n");
-        }else if(id >= 0 && id < lista->n + 1){
+        }else if(id >= 0){
 
                 while(*act != NULL && found == 0){
 
@@ -780,7 +788,6 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                 else if(tipo == 0){
                                         pos->tarefa->fim = NULL;
                                         pos->tarefa->fase = fase;
-                                        desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
                                         insere_tarefa(to,pos->tarefa,2);
                                 }
                                 if(trys != 3){
@@ -902,7 +909,7 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
 
 /*******************************************************************
 *
-* FILE MANAGMENT SECTION
+*                                                 FILE MANAGMENT SECTION
 *
 ********************************************************************/
 
@@ -933,7 +940,7 @@ void upload_workers(Pessoa *nova, lista_pessoas lista, lista_pessoas rep){ /* ca
                         no->next = act;
 
                 }else if(no->p->id == act->p->id){
-
+                        rep->n++;
                         no->next = rep->next;
                         rep->next =no;
 
@@ -954,8 +961,10 @@ void correct_id(lista_pessoas lista, lista_pessoas rep){ /*Coloca o ids corretam
         int done = 1;
 
         while(act !=NULL){
-                ante = lista->next;
+                ante = lista;
                 post = ante->next;
+                printf("%s",act->p->nome);
+
                 while(done != 0 && post->next != NULL){
                         if(act->p->id == post->p->id){
                                 act->p->id++;
@@ -971,7 +980,7 @@ void correct_id(lista_pessoas lista, lista_pessoas rep){ /*Coloca o ids corretam
                                 done = 0;
                         }
                 }
-                if(post->next == NULL && done != 0){
+                if(done != 0){
                        if(act->p->id == post->p->id){
                                 rep->next = act->next;
                                 act->p->id++;
@@ -1000,7 +1009,7 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
         FILE *file = fopen("workers.txt","r");
         char *p, *q;
         char line[100];
-        char temp[100];
+        char temp[50];
         Pessoa *nova;
         lista_pessoas repetidos = cria_lista_pessoas();
 
@@ -1046,9 +1055,10 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
                 nova->mytasks = cria_lista_tarefas();
                 nova->max_task = max_t;
                 upload_workers(nova,P_Lista,repetidos);
-
         }
-        correct_id(P_Lista,repetidos);
+        if(repetidos->n > 0){
+                correct_id(P_Lista,repetidos);
+        }
         imprime_lista_pessoas(P_Lista);
         fclose(file);
 
@@ -1177,9 +1187,16 @@ void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_p
         if(task->fase == 1){
                 insere_tarefa(Todo,task,2);
         }else if( task-> fase == 2){
-                insere_tarefa(Doing,task,3);
                 get_worker(P_Lista,&worker,task->personId);
-                task->worker = worker->p;
+                if(worker->p->id != task->personId){
+                        task->personId = 0;
+                        task->fase = 1;
+                        insere_tarefa(Todo,task,2);
+                }else{
+                        task->worker = worker->p;
+                        insere_tarefa(worker->p->mytasks,task,0);
+                        insere_tarefa(Doing,task,3);
+                }
         }else if(task->fase == 3){
                 insere_tarefa(Done,task,1);
         }
