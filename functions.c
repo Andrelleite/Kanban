@@ -17,7 +17,7 @@
 
         GitHub -> https://github.com//Andrelleite
 
-        n of functions : 24
+        n of functions : 27
         voids : 13
         Task* : 1
         Pessoa* : 1
@@ -899,6 +899,14 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
 
 }
 
+
+/*******************************************************************
+*
+* FILE MANAGMENT SECTION
+*
+********************************************************************/
+
+
 void upload_workers(Pessoa *nova, lista_pessoas lista, lista_pessoas rep){ /* carregamento de trabalhadores em ficheiro */
 
         lista_pessoas no = (lista_pessoas)malloc(sizeof(P_Node));
@@ -938,7 +946,7 @@ void upload_workers(Pessoa *nova, lista_pessoas lista, lista_pessoas rep){ /* ca
 
 }
 
-void correct_id(lista_pessoas lista, lista_pessoas rep){
+void correct_id(lista_pessoas lista, lista_pessoas rep){ /*Coloca o ids corretamente, corrigindo os repetidos*/
 
         lista_pessoas ante;
         lista_pessoas post;
@@ -1127,7 +1135,7 @@ void put_on_text_task(lista_task lista){ /* escreve em ficheiro as tarefas */
 
 }
 
-Data *translate_date(char *data){
+Data *translate_date(char *data){ /* transcreve data para interios em estrutura Data*/
 
         int dia,mes,ano;
         int i,j = 0;
@@ -1162,20 +1170,32 @@ Data *translate_date(char *data){
         return d;
 }
 
+void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_pessoas P_Lista, Task *task){
 
-void upload_info_task(lista_task T_Lista){ /* carregamento de informacao em ficheiro */
+        lista_pessoas worker;
+
+        if(task->fase == 1){
+                insere_tarefa(Todo,task,2);
+        }else if( task-> fase == 2){
+                insere_tarefa(Doing,task,3);
+                get_worker(P_Lista,&worker,task->personId);
+                task->worker = worker->p;
+        }else if(task->fase == 3){
+                insere_tarefa(Done,task,1);
+        }
+
+}
+
+void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, lista_task Done, lista_pessoas P_Lista){ /* carregamento de informacao em ficheiro */
 
         int i , j = 0;
         int p = 0;
         FILE *file = fopen("task.txt","r");
         char line[100];
         char temp[100];
-        char desc[40];
         int comp;
         char *pString;
         Task *task;
-        lista_task lista = cria_lista_tarefas();
-        lista_task no;
 
         printf("\n\n____  LOADING INFORMATION ____\n\n");
 
@@ -1212,16 +1232,20 @@ void upload_info_task(lista_task T_Lista){ /* carregamento de informacao em fich
                         }else  if(p == 5){
                                 task->inicio = translate_date(pString);
                         }else  if(p == 6){
-                                task->prazo = translate_date(pString);
+                                if(pString[0] == '0' ){
+                                        task->fim = NULL;
+                                }else{
+                                        task->fim = translate_date(pString);
+                                }
                         }else  if(p == 7){
-                                task->fim = translate_date(pString);
+                                task->prazo = translate_date(pString);
                         }else{
                                 task->fase = atoi(pString);
                         }
                         memset(temp,0,sizeof(temp));
                         task->worker = NULL;
                 }
-
+                sector_selector(To_do,Doing,Done,P_Lista,task);
                 insere_tarefa(T_Lista,task,2);
         }
         imprime_lista_tarefas(T_Lista);

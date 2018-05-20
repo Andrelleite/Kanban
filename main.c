@@ -3,11 +3,13 @@
 #include <string.h>
 #include "header.h"
 
-void running(lista_pessoas P_Lista){
+void running(lista_pessoas P_Lista, lista_task T_Lista, lista_task To_do, lista_task Doing, lista_task Done){
 
 
 
         upload_info(P_Lista);
+        system("cls");
+        upload_info_task(T_Lista, To_do, Doing, Done, P_Lista);
         system("cls");
         printf("\n\n\n\n\n\n\t\t _________________________________\n");
         printf("\t\t|_________________________________|\n\t\t|________PROJETO PPP 2018_________|\n\t\t|_________________________________|\n");
@@ -172,17 +174,16 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
 
 int main(){
 
-       /* lista_pessoas P_Lista = cria_lista_pessoas();
+        lista_pessoas P_Lista = cria_lista_pessoas();
         lista_task T_Lista = cria_lista_tarefas();
         lista_task Todo_List = cria_lista_tarefas();
         lista_task Doing_List = cria_lista_tarefas();
         lista_task Done_List = cria_lista_tarefas();
 
-        running(P_Lista);
+        running(P_Lista,T_Lista, Todo_List, Doing_List, Done_List);
 
-        menu(P_Lista, T_Lista, Todo_List, Doing_List, Done_List);*/
-        lista_task task = cria_lista_tarefas();
-        upload_info_task(task);
+        menu(P_Lista, T_Lista, Todo_List, Doing_List, Done_List);
+
 
         return 0;
 }
