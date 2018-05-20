@@ -159,7 +159,7 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                         break;
                 case 0:
                         put_on_text(P_Lista);
-                        put_on_bin(Todo,Doing,Done,T_Lista);
+                        put_on_text_task(T_Lista);
                         printf("**Toda a informacao foi guardada em ficheiros **\n");
                         printf("**E possivel que alguma informacao tenha sofrido alteracoes para corrigir erros de input em ficheiros.**\n");
                         break;
@@ -172,7 +172,7 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
 
 int main(){
 
-        lista_pessoas P_Lista = cria_lista_pessoas();
+       /* lista_pessoas P_Lista = cria_lista_pessoas();
         lista_task T_Lista = cria_lista_tarefas();
         lista_task Todo_List = cria_lista_tarefas();
         lista_task Doing_List = cria_lista_tarefas();
@@ -180,7 +180,9 @@ int main(){
 
         running(P_Lista);
 
-        menu(P_Lista, T_Lista, Todo_List, Doing_List, Done_List);
+        menu(P_Lista, T_Lista, Todo_List, Doing_List, Done_List);*/
+        lista_task task = cria_lista_tarefas();
+        upload_info_task(task);
 
         return 0;
 }

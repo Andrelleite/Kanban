@@ -108,6 +108,10 @@ void put_on_text(lista_pessoas lista);
 
 int check_order(lista_pessoas lista);
 
-void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista);
+void put_on_text_task( lista_task T_Lista);
+
+void upload_info_task(lista_task T_Lista);
+
+Data *translate_date(char *data);
 
 #endif

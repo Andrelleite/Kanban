@@ -1,7 +1,7 @@
-A,20,kdk,1,
-F,20,kdk,2,
-B,21,kkk,3,
-C,22,KKK,3,
-D,22,KDD,4,
-F,22,FD,4,
-W,24,EFD,2,
+A,20,kdk,1
+F,20,kdk,2
+B,21,kkk,3
+D,22,KDD,4
+W,24,EFD,5
+F,22,FD,6
+C,22,KKK,7

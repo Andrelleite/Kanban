@@ -8,12 +8,7 @@
 
         LEFT:
                 Restrição de uma tarefa por semana
-                Mudar prioridade durante a aplicação X
-                Escrever tarefas em ficheiro
-                dar id da pessoa à tarefa X
-                Atribuir fase em numero À tarefa X
-
-
+                ler tarefas do ficheiro
 
 
         Todas as funções têm um papel fulcral, sendo que existem algumas que se tornam preponderantes na implementação deste código, uma vez que são utilizadas constantemente
@@ -468,7 +463,7 @@ void imprime_lista_tarefas(lista_task lista){ /* Fazer diplay de TODAS as tarefa
                 while(act != NULL){
                         tarefa = act->tarefa;
                         printf("Fase em Kankan: %d\n",tarefa->fase);
-                        printf("Descricao: %s",tarefa->descricao);
+                        printf("Descricao: %s\n",tarefa->descricao);
                         printf("Prioridade: %d\n",tarefa->priority);
                         printf("ID tarefa: %d\n",tarefa->id);
 
@@ -495,7 +490,7 @@ void imprime_lista_tarefas(lista_task lista){ /* Fazer diplay de TODAS as tarefa
                        if(tarefa->worker == NULL){
                                 printf("Trabalhador encarregue: (ainda sem trabalhador)\n");
                         }else{
-                                printf("Trabalhador encarregue: %s \n",tarefa->worker->nome);
+                                printf("Trabalhador encarregue: %s\n",tarefa->worker->nome);
                         }
                         printf("__________________________________________________\n\n");
                         act = act->next;
@@ -1019,7 +1014,7 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
                 while(*p != '\n' && *p != '\0'){
                         q = temp;
                         i = 0;
-                        while( *p != ','){
+                        while( *p != ',' && *p != '\n' && *p != '\0'){
                                 *q = *p;
                                 q++;
                                 p++;
@@ -1052,7 +1047,7 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
 
 }
 
-void put_on_text(lista_pessoas lista){ /* escreve informacao em ficheiro*/
+void put_on_text(lista_pessoas lista){ /* escreve informacao dos trabalhadores em ficheiro em ficheiro*/
 
         FILE *file = fopen("workers.txt","w");
         char *pos;
@@ -1069,11 +1064,8 @@ void put_on_text(lista_pessoas lista){ /* escreve informacao em ficheiro*/
                 if ((pos=strchr(worker->mail, '\n')) != NULL)
                         *pos = '\0';
 
-
                 fprintf(file,"%s,%d,%s,%d,\n",worker->nome,worker->idade,worker->mail,worker->id);
-
                 act = act->next;
-
         }
 
 
@@ -1081,10 +1073,157 @@ void put_on_text(lista_pessoas lista){ /* escreve informacao em ficheiro*/
         fclose(file);
 }
 
-void put_on_bin(lista_task Todo, lista_task Doing, lista_task Done, lista_task T_Lista){ /* escreve em ficheiro binario */
+void put_on_text_task(lista_task lista){ /* escreve em ficheiro as tarefas */
+
+        FILE *file = fopen("task.txt","w");
+        char *pos;
+        lista_task act = lista->next;
+        Task *tarefa;
+
+        int id, idperson;
+        int diai,mesi,anoi;
+        int diaf,mesf,anof;
+        int diap,mesp,anop;
+        int fase;
+        int prio;
+
+        while(act != NULL){
+
+                tarefa = act->tarefa;
+
+                prio = tarefa->priority;
+                id = tarefa->id;
+                fase = tarefa->fase;
+                idperson = tarefa->personId;
+                diai = tarefa->inicio->dia;
+                mesi = tarefa->inicio->mes;
+                anoi = tarefa->inicio->ano;
+
+                diap = tarefa->prazo->dia;
+                mesp = tarefa->prazo->mes;
+                anop = tarefa->prazo->ano;
+
+                if(tarefa->fim){
+                        diaf = tarefa->fim->dia;
+                        mesf = tarefa->fim->mes;
+                        anof = tarefa->fim->ano;
+                }else{
+                        diaf = mesf = anof = 0;
+                }
 
 
+                if ((pos=strchr(tarefa->descricao, '\n')) != NULL){
+                        *pos = '\0';
+                }
+
+                fprintf(file,"%d,%d,%s,%d,%d/%d/%d,%d/%d/%d,%d/%d/%d,%d\n",id,prio,tarefa->descricao,idperson,diai,mesi,anoi,diaf,mesf,anof,diap,mesp,anop,fase);
+
+                act = act->next;
+        }
+
+
+
+        fclose(file);
 
 }
 
+Data *translate_date(char *data){
 
+        int dia,mes,ano;
+        int i,j = 0;
+        int s = 0;
+        int comp = strlen(data);
+        char *p = data;
+        char temp[4];
+        Data *d = (Data*)malloc(sizeof(Data));
+
+        for(i = 0; i < comp ; i++){
+
+                if(*p == '/' || p == '\0'){
+
+                        if(s == 0){
+                                dia = atoi(temp);
+                        }else if(s == 1){
+                                mes = atoi(temp);
+                        }
+                        memset(temp,0,sizeof(temp));
+                        j = 0;
+                        s++;
+                }
+                else{
+                        temp[j] = *p;
+                        j++;
+                }
+                p++;
+
+        }
+        ano = atoi(temp);
+        d->dia = dia; d->mes = mes; d->ano = ano;
+        return d;
+}
+
+
+void upload_info_task(lista_task T_Lista){ /* carregamento de informacao em ficheiro */
+
+        int i , j = 0;
+        int p = 0;
+        FILE *file = fopen("task.txt","r");
+        char line[100];
+        char temp[100];
+        char desc[40];
+        int comp;
+        char *pString;
+        Task *task;
+        lista_task lista = cria_lista_tarefas();
+        lista_task no;
+
+        printf("\n\n____  LOADING INFORMATION ____\n\n");
+
+        if(file == NULL){
+                printf("ERROR LOADING FILE.");
+                exit(1);
+        }
+
+        while( fgets(line,200,file) != NULL ){
+                comp = strlen(line);
+                p = 0;
+                task = (Task*)malloc(sizeof(Task));
+
+                for(i = 0; i < comp-1; i++){
+                        j = 0;
+                        while(line[i] != ',' && line[i] != '\n' && line[i] != '\0'){
+                                temp[j] = line[i];
+                                j++;
+                                i++;
+                        }
+                        pString = (char *)malloc(j*sizeof(char));
+                        pString = temp;
+                        p++;
+
+                        if(p == 1){
+                                task->id = atoi(pString);
+                        }else if(p == 2){
+                                task->priority = atoi(pString);
+                        }else if(p == 3){
+                                task->descricao  = (char *)malloc(j*sizeof(char));
+                                sprintf(task->descricao,"%s",temp);
+                        }else if(p == 4){
+                                task->personId = atoi(pString);
+                        }else  if(p == 5){
+                                task->inicio = translate_date(pString);
+                        }else  if(p == 6){
+                                task->prazo = translate_date(pString);
+                        }else  if(p == 7){
+                                task->fim = translate_date(pString);
+                        }else{
+                                task->fase = atoi(pString);
+                        }
+                        memset(temp,0,sizeof(temp));
+                        task->worker = NULL;
+                }
+
+                insere_tarefa(T_Lista,task,2);
+        }
+        imprime_lista_tarefas(T_Lista);
+        fclose(file);
+}
