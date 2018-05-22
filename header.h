@@ -114,6 +114,8 @@ void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, li
 
 void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_pessoas P_Lista, Task *task);
 
+int weekly_gap(lista_task lista, Data*d2);
+
 Data *translate_date(char *data);
 
 #endif

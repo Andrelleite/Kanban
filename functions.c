@@ -28,7 +28,7 @@
 
 /*******************************************************************
 *
-*                                               APLICATION OPERATION SECTION
+*                                               APLICATION OPERATIONS SECTION
 *
 ********************************************************************/
 
@@ -161,7 +161,7 @@ int get_worker(lista_pessoas lista, lista_pessoas *act, int id){ /* obter um tra
 
         if(lista->next == NULL){
                 printf("    (Sem trabalhadores)\n\n");
-        }else if(id >= 0){
+        }else if(id > 0){
 
                 while(*act != NULL && found == 0){
 
@@ -254,13 +254,15 @@ void worker_info(lista_pessoas lista){ /* Obter informação de um trabalhador */
 Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         Task *nova = (Task *)malloc(sizeof(Task));
+        lista_task prox;
         int comp;
+        int check = 0;
+        int i;
 
         system("cls");
 
         printf("\n\n\tCriacao de Tarefa\n\n");
 
-        nova->id = lista->n+1;
 
         printf("Prioridade (1-10) : ");
         scanf("%d",&nova->priority);
@@ -306,6 +308,19 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         }
 
+        i = 1;
+        prox = lista->next;
+        while(prox != NULL && check == 0){
+                if(i == prox->tarefa->id){
+                        i++;
+                }else{
+                        check = 1;
+                }
+                prox = prox->next;
+        }
+        nova->id = i;
+
+
         nova->fim = NULL;
         nova->worker = NULL;
         nova->personId= 0;
@@ -315,7 +330,7 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
         printf("Pressione Enter para continuar... ");
         getchar();
 
-        insere_tarefa(lista,nova,0);
+        insere_tarefa(lista,nova,4);
 
         return nova;
 }
@@ -450,6 +465,28 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                       }
 
                 }
+                else if(flag == 4){ /* Ordenamento por ordem id */
+
+                        while(nova->id > then->tarefa->id && then->next != NULL){
+
+                                ante = then;
+                                then = then->next;
+                        }
+
+                      if( nova->id < then->tarefa->id ){
+
+                                ante->next = no;
+                                no->next = then;
+
+                      }
+                      else{
+
+                                no->next = then->next;
+                                then->next = no;
+
+                      }
+
+                }
 
         }
 
@@ -533,6 +570,7 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
         int got;
         int choice;
         int passed = 0;
+        int week_check;
 
         printf("_____Atribuicao de tarefas_____\n\n");
 
@@ -572,12 +610,14 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
                 got = get_task(lista_t,&ant,&task, id);
 
                 if(got && act->p->mytasks->n < act->p->max_task){
-
-                        if(task->tarefa->worker == NULL){
+                        week_check = weekly_gap(act->p->mytasks,task->tarefa->prazo);
+                        if(task->tarefa->worker == NULL && week_check != 1){
                                 insere_tarefa(act->p->mytasks,task->tarefa,0);
                                 task->tarefa->worker = act->p;
                                 task->tarefa->personId=act->p->id;
                                 passed = 1;
+                        }else if(week_check == 1){
+                                printf("Este trabalhador ja tem tarefas para esta semana.\n\n");
                         }
                         else if(task->tarefa->worker->id == act->p->id){
                                 printf("Esta tarefa ja esta atribuida\n\n");
@@ -906,6 +946,65 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
 
 }
 
+int weekly_gap(lista_task lista, Data*d2){ /*Verificar se os prazos estão presentes na mesma semana*/
+
+        lista_task ant = lista;
+        lista_task prox =  ant->next;
+        int dia,mes,ano;
+        int dif;
+        int checker = 0;
+
+        while(prox != NULL && checker != 1){
+
+                dia = prox->tarefa->prazo->dia;
+                mes = prox->tarefa->prazo->mes;
+                ano = prox->tarefa->prazo->ano;
+
+
+                if(d2->ano == ano){
+                        if(d2->mes == mes){
+                                dif = d2->dia - dia;
+                                if(dif < 0){
+                                        dif = -1*dif;
+                                }
+                                if(dif <= 6 && dif >= 0){
+                                        checker = 1;
+                                }
+                        }
+                }
+
+
+
+                ant = prox;
+                prox = prox->next;
+
+        }
+
+        return checker;
+
+}
+
+int get_week_day(Data *d1){
+
+        int d = d1->dia;
+        int m = d1->mes;
+        int y = d1->ano;
+        int week_day;
+
+        if ( m < 3 ){
+                d = d + y;
+                y--;
+        }
+        else{
+                d = d + y - 2;
+        }
+
+        week_day = (23 * m/9) + d + 4 + y/4 - y/100 + y/400;
+        week_day = week_day % 7;
+
+        return week_day;
+
+}
 
 /*******************************************************************
 *
@@ -963,7 +1062,6 @@ void correct_id(lista_pessoas lista, lista_pessoas rep){ /*Coloca o ids corretam
         while(act !=NULL){
                 ante = lista;
                 post = ante->next;
-                printf("%s",act->p->nome);
 
                 while(done != 0 && post->next != NULL){
                         if(act->p->id == post->p->id){
@@ -1026,36 +1124,43 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
 
                 p = line;
                 j = 0;
-                nova = (Pessoa *)malloc(sizeof(Pessoa));
-
-                while(*p != '\n' && *p != '\0'){
-                        q = temp;
-                        i = 0;
-                        while( *p != ',' && *p != '\n' && *p != '\0'){
-                                *q = *p;
-                                q++;
-                                p++;
-                                i++;
+                for(i = 0; i < strlen(line); i++){
+                        if(line[i] == ','){
+                                j++;
                         }
-                        if( j == 0 ){
-                                nova->nome = (char *)malloc(i*sizeof(char));
-                                sprintf(nova->nome,"%s",temp);
-                        }else if(j == 1){
-                                nova->idade = atoi(temp);
-                        }else if(j == 2){
-                                nova->mail = (char *)malloc(i*sizeof(char));
-                                sprintf(nova->mail,"%s",temp);
-                        }else if(j == 3){
-                                nova->id = atoi(temp);
-                        }
-                        j++;
-                        memset(temp, 0, sizeof(temp));
-                        p++;
                 }
-                nova->mytasks = cria_lista_tarefas();
-                nova->max_task = max_t;
-                upload_workers(nova,P_Lista,repetidos);
-        }
+                if(j == 3 || j == 4){
+                        j = 0;
+                        nova = (Pessoa *)malloc(sizeof(Pessoa));
+                        while(*p != '\n' && *p != '\0' ){
+                                q = temp;
+                                i = 0;
+                                while( *p != ',' && *p != '\n' && *p != '\0'){
+                                        *q = *p;
+                                        q++;
+                                        p++;
+                                        i++;
+                                }
+                                if( j == 0 ){
+                                        nova->nome = (char *)malloc(i*sizeof(char));
+                                        sprintf(nova->nome,"%s",temp);
+                                }else if(j == 1){
+                                        nova->idade = atoi(temp);
+                                }else if(j == 2){
+                                        nova->mail = (char *)malloc(i*sizeof(char));
+                                        sprintf(nova->mail,"%s",temp);
+                                }else if(j == 3){
+                                        nova->id = atoi(temp);
+                                }
+                                j++;
+                                memset(temp, 0, sizeof(temp));
+                                p++;
+                        }
+                        nova->mytasks = cria_lista_tarefas();
+                        nova->max_task = max_t;
+                        upload_workers(nova,P_Lista,repetidos);
+                        }
+                }
         if(repetidos->n > 0){
                 correct_id(P_Lista,repetidos);
         }
@@ -1180,7 +1285,7 @@ Data *translate_date(char *data){ /* transcreve data para interios em estrutura 
         return d;
 }
 
-void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_pessoas P_Lista, Task *task){
+void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_pessoas P_Lista, Task *task){ /*coloca a tarefa no sector correto*/
 
         lista_pessoas worker;
 
@@ -1188,6 +1293,7 @@ void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_p
                 insere_tarefa(Todo,task,2);
         }else if( task-> fase == 2){
                 get_worker(P_Lista,&worker,task->personId);
+                printf("%s",worker->p->nome);
                 if(worker->p->id != task->personId){
                         task->personId = 0;
                         task->fase = 1;
@@ -1226,7 +1332,7 @@ void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, li
                 p = 0;
                 task = (Task*)malloc(sizeof(Task));
 
-                for(i = 0; i < comp-1; i++){
+                for(i = 0; i < comp; i++){
                         j = 0;
                         while(line[i] != ',' && line[i] != '\n' && line[i] != '\0'){
                                 temp[j] = line[i];
@@ -1263,7 +1369,7 @@ void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, li
                         task->worker = NULL;
                 }
                 sector_selector(To_do,Doing,Done,P_Lista,task);
-                insere_tarefa(T_Lista,task,2);
+                insere_tarefa(T_Lista,task,4);
         }
         imprime_lista_tarefas(T_Lista);
         fclose(file);
