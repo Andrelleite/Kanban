@@ -25,9 +25,9 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
         Task *temp;
         system("cls");
 
-        printf("       | MAIN MENU |\n\n______ TRABALHADORES ______\n\n[1] Inserir Pessoa\n[2] Vizualizar Lista de Trabalhadores\n[3] Informacao do trabalhador\n\n");
-        printf("______    TAREFAS    ______\n\n[4] Criar Nova Tarefa\n[5] Vizualizar Lista de Tarefas\n\n");
-        printf("______ KANBAN STATUS ______\n\n[6] Visualizar todo o quadro\n[7] Tarefas na secao To Do\n[8] Tarefas na seccao Doing\n[9] Tarefas na seccao Done\n\n");
+        printf("       | MAIN MENU |\n\n______ TRABALHADORES ______\n\n[1] Inserir Pessoa\n[2] Visualizar Lista de Trabalhadores\n[3] Informacao do trabalhador\n\n");
+        printf("______    TAREFAS    ______\n\n[4] Criar Nova Tarefa\n[5] Visualizar Lista de Tarefas\n\n");
+        printf("______ KANBAN STATUS ______\n\n[6] Visualizar todo o quadro\n[7] Tarefas na seccao To Do\n[8] Tarefas na seccao Doing\n[9] Tarefas na seccao Done\n\n");
         printf("______KANBAN LISTS OPS______\n\n[10] Mover tarefa em To Do\n[11] Mover tarefa em Doing\n[12] Mover tarefa em Done\n\n");
         printf("______     OTHERS     ______\n\n[13] Mudar responsavel por tarefa\n[14] Eliminar Tarefa\n[15] Eliminar Trabalhador\n\n\n[0] Exit\n\n");
         printf("\nOpcao [ ] : ");

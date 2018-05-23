@@ -33,7 +33,6 @@
 ********************************************************************/
 
 
-
 lista_task cria_lista_tarefas(){ /* Função para inicializar a lista de tarefas*/
 
         lista_task novo = (Node *) malloc(sizeof(Node));
@@ -53,7 +52,6 @@ lista_pessoas cria_lista_pessoas(){ /* Função para inicializar uma lista de pess
 
         lista_pessoas novo = (lista_pessoas)malloc(sizeof(P_Node));
         if(novo != NULL){
-                novo->n_task = 1;
                 novo->n = 0 ;
                 novo->next = NULL;
                 novo->p = NULL;
@@ -67,15 +65,33 @@ void insere_pessoa(lista_pessoas lista){ /* Inserção de uma pessoa numa lista li
 
         Pessoa *nova = cria_pessoa(lista);
         lista_pessoas no = (lista_pessoas)malloc(sizeof(P_Node));
+        lista_pessoas ante = lista;
+        lista_pessoas then = ante->next;
 
         no->p = nova;
         no->n = 0;
 
-        if(lista != NULL){
+        if(lista->next == NULL){
 
                 lista->n++;
                 no->next = lista->next;
                 lista->next = no;
+
+        }else{
+
+                while(nova->id > then->p->id && then->next != NULL){
+                        ante = then;
+                        then = then->next;
+                }
+
+                if( nova->id < then->p->id ){
+                        ante->next = no;
+                        no->next = then;
+                }
+                else{
+                        no->next = then->next;
+                        then->next = no;
+                }
 
         }
 
@@ -156,7 +172,6 @@ void imprime_lista_pessoas(lista_pessoas lista){ /* Fazer display de uma lista d
                 while(act != NULL){
                         pessoa = act->p;
                         printf("Nome: %s | Idade: %d | E-Mail: %s\n | Max Tasks: %d \n | Tarefas adquiridas: %d \n | ID: %d\n__________________________________________________\n\n",pessoa->nome,pessoa->idade,pessoa->mail, pessoa->max_task,pessoa->mytasks->n,pessoa->id);
-
                         act = act->next;
                 }
 
@@ -705,7 +720,7 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                         printf("\nAlterar Prazo final ? [ 1 - sim / 0 - nao]\n-> ");
                                         scanf("%d",&passed);
 
-                                        if(passed){
+                                        if(passed){ /* alterar prazo final */
 
                                                 printf("\nNovo prazo final ");
 
@@ -818,6 +833,9 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                 }
 
                                 else if(tipo == 0){
+                                        if(pos->tarefa->fase == 2){
+                                                desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
+                                        }
                                         pos->tarefa->fim = NULL;
                                         pos->tarefa->fase = fase;
                                         insere_tarefa(to,pos->tarefa,2);
@@ -858,7 +876,7 @@ int compare_date(Data *d1, Data *d2){ /*Comparar datas*/
 
 void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhador responsavel por tarefa*/
 
-
+        int week_check;
         int choice, id, found;
         lista_task ante, then;
         lista_pessoas ant, atual;
@@ -899,7 +917,9 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
 
                         if(found){
 
-                                if(atual->p->mytasks->n < atual->p->max_task){
+                                week_check = weekly_gap(atual->p->mytasks,then->tarefa->prazo);
+                                if((atual->p->mytasks->n < atual->p->max_task) && week_check != 1 ){
+
                                         desassocia_tarefa(then->tarefa);
                                         elimina_no_task(doing,ante,then);
                                         then->tarefa->worker = atual->p;
@@ -907,8 +927,10 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
                                         insere_tarefa(atual->p->mytasks,then->tarefa,0);
                                         insere_tarefa(doing,then->tarefa,3);
 
+                                }else if(week_check == 1){
+                                        printf("\nEste trabalhador ja tem tarefas esta semana.\n");
                                 }else{
-                                        printf("\nEste trabalhador já atingiu o limite maximo de tarefas.\n");
+                                        printf("\nEste trabalhador ja atingiu o limite maximo de tarefas.\n");
                                 }
                         }else{
                                 printf("\nAlgo esta errado. Tente novamente.\n\n");
@@ -1010,7 +1032,6 @@ int weekly_gap(lista_task lista, Data*d2){ /*Verificar se os prazos estão presen
 *                                                 EIMINAÇÃO DE DADOS
 *
 ********************************************************************/
-
 
 void elimina_no_task(lista_task tarefa, lista_task ant, lista_task act){ /* Função para retirar elemento de uma lista de tarefas */
 

@@ -17,7 +17,7 @@
 
 5) Não há limitação de caracteres na inserção;
 
-6) Ao inserir no ficheiro tenha o cuidado de inserir um novo trabalhador sempre na primeira linha ou em linhas, superirores ao último inserido, assim:
+6) Ao inserir no ficheiro tenha o cuidado de inserir um novo trabalhador sempre na ultima linha ou em linhas, superirores ao último inserido, assim:
 
 	1ª inserção:
 
@@ -33,8 +33,8 @@
 
 		   Formato Correto -> [nome,idade,mail,id]	
 
-		-> Ana Gonçalves,20,anagoncalves@gmail.com,10
 		-> Andre Leite,20,leiteandre4@gmail.com,4
+		-> Ana Gonçalves,20,anagoncalves@gmail.com,10
 
 7) Mesmo que fique desordenado a início a aplicalão tratará de rearranjar a oredenação. Assim, no final, a listagem irá estar ordenada;
 

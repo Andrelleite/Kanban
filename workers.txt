@@ -2,10 +2,9 @@ NUMERO_TAREFAS_MAXIMO: 3
 
 Formato correto -> [nome,idade,email,ID]
 
-Ana Rita,24,rita@gmail.com,1,
-Joao Miguel,26,mig@hotmail.com,3,
-Patricia Vieira,21,pisabelvi@gmail.com.com,4,
-Jorge Amado,68,amado@outlook.com,6,
-Paulo Daniel,57,paulodcabraleite@gmail.com,9,
-Luisa Cosme,53,luisamc@gmail.com,12,
-Andre Leite,20,leiteandre4@gmail.com,15,
+Ana Goncalves,19,cenas@cenas.com,1,
+Andre Leite,21,leiteandr@gmail.com,2,
+Jose Manuel,52,manu@gmail.com,3,
+Patricia Vieira,21,pisabelvi@gmail.com,4,
+Maria Teves,39,tev@gmail.com,5,
+Helder Gomes,32,goms@hotmail.com,6,
