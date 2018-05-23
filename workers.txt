@@ -2,7 +2,8 @@ NUMERO_TAREFAS_MAXIMO: 3
 
 Formato correto -> [nome,idade,email,ID]
 
-Ana Rita,24,rita@hotmail.com,1,
+Ana Rita,24,rita@gmail.com,1,
+Joao Miguel,26,mig@hotmail.com,3,
 Patricia Vieira,21,pisabelvi@gmail.com.com,4,
 Ze Ninguem,25,nobody@none.com,5,
 Jorge Amado,68,amado@outlook.com,6,

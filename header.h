@@ -118,4 +118,6 @@ int weekly_gap(lista_task lista, Data*d2);
 
 Data *translate_date(char *data);
 
+void eliminate_task(lista_task lista, lista_task todo, lista_task done);
+
 #endif

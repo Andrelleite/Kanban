@@ -1013,6 +1013,43 @@ int weekly_gap(lista_task lista, Data*d2){ /*Verificar se os prazos estão presen
 
 }
 
+void eliminate_task(lista_task lista, lista_task todo, lista_task done){ /* elimina tarefa permanentemente */
+
+        int id, found;
+        lista_task ant;
+        lista_task act;
+
+        system("cls");
+        imprime_lista_tarefas(lista);
+
+        printf("\nID da tarefa para eliminacao: ");
+        scanf("%d",&id);
+        getchar();
+
+        found = get_task(lista,&ant,&act,id);
+
+        if(found){
+                if(act->tarefa->fase == 2){
+                        printf("\nNao e possivel eliminar tarefas que tenham trabalhadores associados.\n\n");
+                }else{
+                        elimina_no_task(lista,ant,act);
+                        if(act->tarefa->fase == 1){
+                                get_task(todo,&ant,&act,id);
+                                elimina_no_task(todo,ant,act);
+                        }else if(act->tarefa->fase == 3){
+                                get_task(done,&ant,&act,id);
+                                elimina_no_task(done,ant,act);
+                        }
+                        free(act);
+                }
+        }else{
+                printf("\nTarefa nao encontrada. Tente novamente.\n\n");
+        }
+
+        printf("Pressione Enter para continuar... ");
+        getchar();
+
+}
 
 /*******************************************************************
 *
@@ -1142,7 +1179,7 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
                                 j++;
                         }
                 }
-                if((j == 3 || j == 4) && l >= 4){
+                if((j == 3 || j == 4) && l > 4){
                         j = 0;
                         nova = (Pessoa *)malloc(sizeof(Pessoa));
                         nova->mytasks = cria_lista_tarefas();
@@ -1177,8 +1214,8 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
                         sscanf(line,"%s %d",temp,&max_t);
                         memset(temp, 0, sizeof(temp));
                 }
-        }
 
+        }
         if(repetidos->n > 0){
                 correct_id(P_Lista,repetidos);
         }
@@ -1199,7 +1236,6 @@ void put_on_text(lista_pessoas lista){ /* escreve informacao dos trabalhadores e
         while(act != NULL){
 
                 worker = act->p;
-
 
                 if ((pos=strchr(worker->nome, '\n')) != NULL)
                         *pos = '\0';
@@ -1370,7 +1406,7 @@ void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, li
                         }
                 }
 
-                if((j == 6 || j == 7) && l > 2){
+                if((j == 6 || j == 7) && l >= 3){
                         for(i = 0; i < comp; i++){
                                 j = 0;
                                 while(line[i] != ',' && line[i] != '\n' && line[i] != '\0'){
@@ -1415,6 +1451,6 @@ void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, li
         system("cls");
         imprime_lista_pessoas(P_Lista);
         imprime_lista_tarefas(T_Lista);
-
+        system("cls");
         fclose(file);
 }
