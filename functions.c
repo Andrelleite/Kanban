@@ -167,11 +167,11 @@ void imprime_lista_pessoas(lista_pessoas lista){ /* Fazer display de uma lista d
 
 }
 
-int get_worker(lista_pessoas lista, lista_pessoas *act, int id){ /* obter um trabalhador pelo seu ID */
+int get_worker(lista_pessoas lista,lista_pessoas *ant, lista_pessoas *act, int id){ /* obter um trabalhador pelo seu ID */
 
         int found  = 0;
         *act = lista->next;
-
+        *ant = lista;
         if(lista->next == NULL){
                 printf("    (Sem trabalhadores)\n\n");
         }else if(id > 0){
@@ -181,6 +181,7 @@ int get_worker(lista_pessoas lista, lista_pessoas *act, int id){ /* obter um tra
                         if( (*act)->p->id == id ){
                                 found = 1;
                         }else{
+                                (*ant) = (*act);
                                 (*act) = (*act)->next;
                         }
                 }
@@ -229,6 +230,7 @@ int get_task(lista_task lista,lista_task *ant ,lista_task *act, int id){ /* obte
 void worker_info(lista_pessoas lista){ /* Obter informação de um trabalhador */
 
         lista_pessoas work;
+        lista_pessoas ant;
         Pessoa *p;
         int id;
         int choice;
@@ -241,7 +243,7 @@ void worker_info(lista_pessoas lista){ /* Obter informação de um trabalhador */
         scanf("%d",&id);
         getchar();
 
-        got = get_worker(lista,&work,id);
+        got = get_worker(lista,&ant,&work,id);
 
         if(got){
                 p = work->p;
@@ -564,6 +566,7 @@ Data *set_data(){ /* Criar uma data */
 int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atribuir uma tarefa a um dado trabalhador */
 
         lista_pessoas act;
+        lista_pessoas ante;
         lista_task task;
         lista_task ant;
         int id;
@@ -588,7 +591,7 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
         getchar();
         printf("\n");
 
-        got = get_worker(lista_p,&act,id);
+        got = get_worker(lista_p,&ante,&act,id);
 
         if(got){
 
@@ -640,17 +643,6 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
         getchar();
 
         return passed;
-
-}
-
-void elimina_no_task(lista_task tarefa, lista_task ant, lista_task act){ /* Função para retirar elemento de uma lista de tarefas */
-
-
-        tarefa->n--;
-        ant->next = act->next;
-        printf("\nTarefa eliminada com sucesso.\n\n");
-
-
 
 }
 
@@ -869,7 +861,7 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
 
         int choice, id, found;
         lista_task ante, then;
-        lista_pessoas atual;
+        lista_pessoas ant, atual;
 
         system("cls");
 
@@ -903,7 +895,7 @@ void switch_worker(lista_task doing , lista_pessoas geral){ /*Alterar trabalhado
                         scanf("%d",&id);
                         getchar();
 
-                        found = get_worker(geral,&atual,id);
+                        found = get_worker(geral,&ant,&atual,id);
 
                         if(found){
 
@@ -1013,6 +1005,21 @@ int weekly_gap(lista_task lista, Data*d2){ /*Verificar se os prazos estão presen
 
 }
 
+/*******************************************************************
+*
+*                                                 EIMINAÇÃO DE DADOS
+*
+********************************************************************/
+
+
+void elimina_no_task(lista_task tarefa, lista_task ant, lista_task act){ /* Função para retirar elemento de uma lista de tarefas */
+
+        tarefa->n--;
+        ant->next = act->next;
+        printf("\nTarefa eliminada com sucesso.\n\n");
+
+}
+
 void eliminate_task(lista_task lista, lista_task todo, lista_task done){ /* elimina tarefa permanentemente */
 
         int id, found;
@@ -1044,6 +1051,46 @@ void eliminate_task(lista_task lista, lista_task todo, lista_task done){ /* elim
                 }
         }else{
                 printf("\nTarefa nao encontrada. Tente novamente.\n\n");
+        }
+
+        printf("Pressione Enter para continuar... ");
+        getchar();
+
+}
+
+void elimina_no_worker(lista_pessoas lista, lista_pessoas ant, lista_pessoas act){ /* elimina no da lista e liberta a sua memoria*/
+
+        lista->n--;
+        ant->next = act->next;
+        free(act);
+        printf("\nTrabalhador eliminado com sucesso.\n\n");
+
+
+}
+
+void eliminate_worker(lista_pessoas lista){
+
+        int id, found;
+        lista_pessoas ant;
+        lista_pessoas act;
+
+        system("cls");
+        imprime_lista_pessoas(lista);
+
+        printf("\nID de trabalhador para eliminacao: ");
+        scanf("%d",&id);
+        getchar();
+
+        found = get_worker(lista,&ant,&act,id);
+
+        if(found){
+                if(act->p->mytasks->n > 0){
+                        printf("\nNao e possivel eliminar um trabalhador com tarefas associadas.\n\n");
+                }else{
+                        elimina_no_worker(lista,ant,act);
+                }
+        }else{
+                printf("\nTrabalhador nao encontrado. Tente Novamente.\n\n");
         }
 
         printf("Pressione Enter para continuar... ");
@@ -1346,12 +1393,13 @@ void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_p
 
         int get;
         lista_pessoas worker;
+        lista_pessoas ante;
 
         if(task->fase == 1){
                 insere_tarefa(Todo,task,2);
         }else if( task-> fase == 2){
                 if(P_Lista->n != 0){
-                        get = get_worker(P_Lista,&worker,task->personId);
+                        get = get_worker(P_Lista,&ante,&worker,task->personId);
                         printf("%d",get);
                         if(get == 0 ){
                                 task->personId = 0;

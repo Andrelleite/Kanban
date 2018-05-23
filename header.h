@@ -80,7 +80,7 @@ void imprime_lista_pessoas(lista_pessoas lista);
 
 void imprime_lista_tarefas(lista_task lista);
 
-int get_worker(lista_pessoas lista, lista_pessoas *act, int id);
+int get_worker(lista_pessoas lista,lista_pessoas *ant, lista_pessoas *act, int id);
 
 void worker_info(lista_pessoas lista);
 
@@ -119,5 +119,9 @@ int weekly_gap(lista_task lista, Data*d2);
 Data *translate_date(char *data);
 
 void eliminate_task(lista_task lista, lista_task todo, lista_task done);
+
+void eliminate_worker(lista_pessoas lista);
+
+void elimina_no_worker(lista_pessoas lista, lista_pessoas ant, lista_pessoas act);
 
 #endif

@@ -29,7 +29,7 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
         printf("______    TAREFAS    ______\n\n[4] Criar Nova Tarefa\n[5] Vizualizar Lista de Tarefas\n\n");
         printf("______ KANBAN STATUS ______\n\n[6] Visualizar todo o quadro\n[7] Tarefas na secao To Do\n[8] Tarefas na seccao Doing\n[9] Tarefas na seccao Done\n\n");
         printf("______KANBAN LISTS OPS______\n\n[10] Mover tarefa em To Do\n[11] Mover tarefa em Doing\n[12] Mover tarefa em Done\n\n");
-        printf("______     OTHERS     ______\n\n[13] Mudar responsavel por tarefa\n[14] Eliminar Tarefa\n\n\n[0] Exit\n\n");
+        printf("______     OTHERS     ______\n\n[13] Mudar responsavel por tarefa\n[14] Eliminar Tarefa\n[15] Eliminar Trabalhador\n\n\n[0] Exit\n\n");
         printf("\nOpcao [ ] : ");
         scanf("%d", &choice);
         getchar();
@@ -158,6 +158,10 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                         break;
                 case 14:
                         eliminate_task(T_Lista,Todo,Done);
+                        menu(P_Lista,T_Lista,Todo,Doing,Done);
+                        break;
+                case 15:
+                        eliminate_worker(P_Lista);
                         menu(P_Lista,T_Lista,Todo,Doing,Done);
                         break;
                 case 0:

@@ -1,6 +1,6 @@
 [ID,Prioridade,Definição,Data_inicio,Data_fim,Prazo,fase]
 
-1,10,Entregar Teste,0,17/11/1997,0/0/0,20/8/2185,1
+1,10,Entregar Teste,12,17/11/1997,0/0/0,20/8/2185,2
 10,8,Semana6,15,10/5/2011,0/0/0,23/5/2018,2
 9,7,Semana5,15,5/2/2014,0/0/0,19/5/2018,2
 3,8,Entregar Relatorio,0,10/5/2018,0/0/0,1/9/2019,1
