@@ -20,8 +20,19 @@
 6) Ao inserir no ficheiro tenha o cuidado de inserir um novo trabalhador sempre na primeira linha ou em linhas, superirores ao último inserido, assim:
 
 	1ª inserção:
+
+		   TAREFAS: X
+
+		   Formato Correto -> [nome,idade,mail,id]	
+
 		-> Andre Leite,20,leiteandre4@gmail.com,4
+
 	2ª inserção:
+
+              	   TAREFAS: X
+
+		   Formato Correto -> [nome,idade,mail,id]	
+
 		-> Ana Gonçalves,20,anagoncalves@gmail.com,10
 		-> Andre Leite,20,leiteandre4@gmail.com,4
 
@@ -31,7 +42,7 @@
 
 9) Respeitar a formatação do ficheiro task.txt (ficheiro de tarefas):
 
-	ID,Prioridade,Definição,Data_inicio,Data_fim,Prazo,fase
+	[ID,Prioridade,Definição,Data_inicio,Data_fim,Prazo,fase]
 
 10) Se a modificação que realizar estiver incorreta, a aplciação irá corrigir, colocando a tarefa no sitio adequado;
 
@@ -41,7 +52,7 @@
 
 13) Caso existam trabalhadores em registo, poderá alterar o numero maximo de tarefas geral, na primeira linha do ficheiro workers.txt;
 
-		-> TAREFAS MAXIMAS: "XYZ"
+		-> TAREFAS: "XYZ"
 
 
 	__________________________

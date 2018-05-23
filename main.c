@@ -8,7 +8,6 @@ void running(lista_pessoas P_Lista, lista_task T_Lista, lista_task To_do, lista_
 
 
         upload_info(P_Lista);
-        getchar();
         upload_info_task(T_Lista, To_do, Doing, Done, P_Lista);
         printf("\n\n\n\n\n\n\t\t _________________________________\n");
         printf("\t\t|_________________________________|\n\t\t|________PROJETO PPP 2018_________|\n\t\t|_________________________________|\n");

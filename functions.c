@@ -6,9 +6,7 @@
 
 /**
 
-        LEFT:
-                Restrição de uma tarefa por semana
-
+        **Ler README.txt**
 
         Todas as funções têm um papel fulcral, sendo que existem algumas que se tornam preponderantes na implementação deste código, uma vez que são utilizadas constantemente
         e até mesmo chamadas pelas outras funções, de modo a tornar o código mais eficiente, mais versátil e mais leve. É importante manter um código bem estruturado para que a sua
@@ -16,12 +14,14 @@
 
         GitHub -> https://github.com//Andrelleite
 
-        n of functions : 27
-        voids : 13
+        Number of functions : 29
+        voids : 16
         Task* : 1
         Pessoa* : 1
-        Data* :  1
-        int: 6
+        Data* :  2
+        int: 7
+        lista_task: 1
+        lista_pessoas: 1
 
 **/
 
@@ -155,7 +155,7 @@ void imprime_lista_pessoas(lista_pessoas lista){ /* Fazer display de uma lista d
                 printf("__________________________________________________\n\n");
                 while(act != NULL){
                         pessoa = act->p;
-                        printf("Nome: %s | Idade: %d | E-Mail: %s | Max Tasks: %d \n | ID: %d\n__________________________________________________\n\n",pessoa->nome,pessoa->idade,pessoa->mail, pessoa->max_task,pessoa->id);
+                        printf("Nome: %s | Idade: %d | E-Mail: %s\n | Max Tasks: %d \n | Tarefas adquiridas: %d \n | ID: %d\n__________________________________________________\n\n",pessoa->nome,pessoa->idade,pessoa->mail, pessoa->max_task,pessoa->mytasks->n,pessoa->id);
 
                         act = act->next;
                 }
@@ -267,10 +267,7 @@ void worker_info(lista_pessoas lista){ /* Obter informação de um trabalhador */
 Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         Task *nova = (Task *)malloc(sizeof(Task));
-        lista_task prox;
         int comp;
-        int check = 0;
-        int i;
 
         system("cls");
 
@@ -321,17 +318,7 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         }
 
-        i = 1;
-        prox = lista->next;
-        while(prox != NULL && check == 0){
-                if(i == prox->tarefa->id){
-                        i++;
-                }else{
-                        check = 1;
-                }
-                prox = prox->next;
-        }
-        nova->id = i;
+        nova->id = lista->n+1;
 
 
         nova->fim = NULL;
@@ -343,7 +330,7 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
         printf("Pressione Enter para continuar... ");
         getchar();
 
-        insere_tarefa(lista,nova,4);
+        insere_tarefa(lista,nova,0);
 
         return nova;
 }
@@ -959,7 +946,7 @@ int check_date_erros(Data *data){ /*Detecao de erros em datas*/
 
 }
 
-int get_week_day(Data *d1){
+int get_week_day(Data *d1){ /* verificação semanal */
 
         int d = d1->dia;
         int m = d1->mes;
@@ -1063,6 +1050,7 @@ void upload_workers(Pessoa *nova, lista_pessoas lista, lista_pessoas rep){ /* ca
                         no->next = act;
                 }else if(no->p->id == act->p->id){
                         rep->n++;
+                        lista->n++;
                         no->next = rep->next;
                         rep->next =no;
                 }else{
@@ -1126,7 +1114,7 @@ void correct_id(lista_pessoas lista, lista_pessoas rep){ /*Coloca o ids corretam
 
 void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em ficheiro */
 
-        int i , j;
+        int i , j, l;
         int max_t;
         FILE *file = fopen("workers.txt","r");
         char *p, *q;
@@ -1141,19 +1129,20 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
                 printf("ERROR.");
                 exit(1);
         }
-
-        max_t =2;
+        l = 0;
 
         while( fgets(line,1024,file) != NULL ){
-
+                l++;
                 p = line;
                 j = 0;
+
+
                 for(i = 0; i < strlen(line); i++){
                         if(line[i] == ','){
                                 j++;
                         }
                 }
-                if(j == 3 || j == 4){
+                if((j == 3 || j == 4) && l >= 4){
                         j = 0;
                         nova = (Pessoa *)malloc(sizeof(Pessoa));
                         nova->mytasks = cria_lista_tarefas();
@@ -1184,9 +1173,11 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
 
                         }
                         upload_workers(nova,P_Lista,repetidos);
+                }else if(l == 1){
+                        sscanf(line,"%s %d",temp,&max_t);
+                        memset(temp, 0, sizeof(temp));
                 }
         }
-        imprime_lista_pessoas(P_Lista);
 
         if(repetidos->n > 0){
                 correct_id(P_Lista,repetidos);
@@ -1202,6 +1193,8 @@ void put_on_text(lista_pessoas lista){ /* escreve informacao dos trabalhadores e
         char *pos;
         lista_pessoas act = lista->next;
         Pessoa *worker;
+
+        fprintf(file,"NUMERO_TAREFAS_MAXIMO: %d\n\nFormato correto -> [nome,idade,email,ID]\n\n",act->p->max_task);
 
         while(act != NULL){
 
@@ -1235,6 +1228,8 @@ void put_on_text_task(lista_task lista){ /* escreve em ficheiro as tarefas */
         int diap,mesp,anop;
         int fase;
         int prio;
+
+        fprintf(file,"[ID,Prioridade,Definição,Data_inicio,Data_fim,Prazo,fase]\n\n");
 
         while(act != NULL){
 
@@ -1346,6 +1341,7 @@ void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_p
 void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, lista_task Done, lista_pessoas P_Lista){ /* carregamento de informacao em ficheiro */
 
         int i , j = 0;
+        int l = 0;
         int p = 0;
         FILE *file = fopen("task.txt","r");
         char line[100] = "";
@@ -1362,49 +1358,63 @@ void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, li
         }
 
         while( fgets(line,200,file) != NULL ){
+                l++;
+                j= 0;
                 comp = strlen(line);
                 p = 0;
                 task = (Task*)malloc(sizeof(Task));
 
-                for(i = 0; i < comp; i++){
-                        j = 0;
-                        while(line[i] != ',' && line[i] != '\n' && line[i] != '\0'){
-                                temp[j] = line[i];
+                for(i = 0; i < strlen(line); i++){
+                        if(line[i] == ','){
                                 j++;
-                                i++;
                         }
-                        pString = (char *)malloc(j*sizeof(char));
-                        pString = temp;
-                        p++;
-
-                        if(p == 1){
-                                task->id = atoi(pString);
-                        }else if(p == 2){
-                                task->priority = atoi(pString);
-                        }else if(p == 3){
-                                task->descricao  = (char *)malloc(j*sizeof(char));
-                                sprintf(task->descricao,"%s",temp);
-                        }else if(p == 4){
-                                task->personId = atoi(pString);
-                        }else  if(p == 5){
-                                task->inicio = translate_date(pString);
-                        }else  if(p == 6){
-                                if(pString[0] == '0' ){
-                                        task->fim = NULL;
-                                }else{
-                                        task->fim = translate_date(pString);
-                                }
-                        }else  if(p == 7){
-                                task->prazo = translate_date(pString);
-                        }else{
-                                task->fase = atoi(pString);
-                        }
-                        memset(temp,0,sizeof(temp));
-                        task->worker = NULL;
                 }
-                sector_selector(To_do,Doing,Done,P_Lista,task);
-                insere_tarefa(T_Lista,task,4);
+
+                if((j == 6 || j == 7) && l > 2){
+                        for(i = 0; i < comp; i++){
+                                j = 0;
+                                while(line[i] != ',' && line[i] != '\n' && line[i] != '\0'){
+                                        temp[j] = line[i];
+                                        j++;
+                                        i++;
+                                }
+                                pString = (char *)malloc(j*sizeof(char));
+                                pString = temp;
+                                p++;
+
+                                if(p == 1){
+                                        task->id = atoi(pString);
+                                }else if(p == 2){
+                                        task->priority = atoi(pString);
+                                }else if(p == 3){
+                                        task->descricao  = (char *)malloc(j*sizeof(char));
+                                        sprintf(task->descricao,"%s",temp);
+                                }else if(p == 4){
+                                        task->personId = atoi(pString);
+                                }else  if(p == 5){
+                                        task->inicio = translate_date(pString);
+                                }else  if(p == 6){
+                                        if(pString[0] == '0' ){
+                                                task->fim = NULL;
+                                        }else{
+                                                task->fim = translate_date(pString);
+                                        }
+                                }else  if(p == 7){
+                                        task->prazo = translate_date(pString);
+                                }else{
+                                        task->fase = atoi(pString);
+                                }
+                                memset(temp,0,sizeof(temp));
+                                task->worker = NULL;
+                        }
+                        sector_selector(To_do,Doing,Done,P_Lista,task);
+                        insere_tarefa(T_Lista,task,0);
+                }
+
         }
+        system("cls");
+        imprime_lista_pessoas(P_Lista);
         imprime_lista_tarefas(T_Lista);
+
         fclose(file);
 }
