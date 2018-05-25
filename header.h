@@ -54,7 +54,6 @@ typedef struct node{ /* Lista ligada para tarefas*/
 typedef struct person_node{ /*Lista ligada para pessoas */
 
         int n;
-        int n_task;
         Pessoa *p;
         lista_pessoas next;
 

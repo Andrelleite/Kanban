@@ -35,12 +35,15 @@
 
 lista_task cria_lista_tarefas(){ /* Função para inicializar a lista de tarefas*/
 
-        lista_task novo = (Node *) malloc(sizeof(Node));
+        lista_task novo = (lista_task) malloc(sizeof(Node));
         if(novo != NULL){
 
                 novo->n = 0;
                 novo->next = NULL;
                 novo->tarefa = NULL;
+
+        }else{
+                printf("ERRO NA ALOCACAO DE MEMORIA\n\n");
 
         }
 
@@ -55,6 +58,9 @@ lista_pessoas cria_lista_pessoas(){ /* Função para inicializar uma lista de pess
                 novo->n = 0 ;
                 novo->next = NULL;
                 novo->p = NULL;
+        }else{
+                printf("ERRO NA ALOCACAO DE MEMORIA\n\n");
+
         }
 
         return novo;
@@ -285,6 +291,10 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         Task *nova = (Task *)malloc(sizeof(Task));
         int comp;
+        int i;
+        int check = 0;
+        lista_task prox;
+        lista_task temp = cria_lista_tarefas();
 
         system("cls");
 
@@ -335,7 +345,24 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         }
 
-        nova->id = lista->n+1;
+        prox = lista->next;
+        while(prox != NULL){
+                insere_tarefa(temp,prox->tarefa,4);
+                prox = prox->next;
+        }
+        prox = temp->next;
+        i = 1;
+        prox = temp->next;
+        while(prox != NULL && check == 0){
+                if(i == prox->tarefa->id){
+                        i++;
+                }else{
+                        check = 1;
+                }
+                prox = prox->next;
+        }
+        nova->id = i;
+        free(temp);
 
 
         nova->fim = NULL;
@@ -358,7 +385,6 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
         lista_task ante = lista;
 
         lista_task no = (lista_task)malloc(sizeof(Node));
-        printf("\nA inserir tarefa...\n");
 
         no->tarefa = nova;
         no->n = 0;
@@ -368,7 +394,6 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
 
                 no->next = then;
                 ante->next = no;
-                printf("Tarefa inserida.\n");
         }
 
         else if(nova != NULL && then != NULL){
