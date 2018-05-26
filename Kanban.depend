@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1527102573 source:c:\users\killz\desktop\fctuc\c_ppp\problemas_3\kanban\main.c
+1527299098 source:c:\users\killz\desktop\fctuc\c_ppp\problemas_3\kanban\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	"header.h"
 
-1527216896 source:c:\users\killz\desktop\fctuc\c_ppp\problemas_3\kanban\functions.c
+1527377132 source:c:\users\killz\desktop\fctuc\c_ppp\problemas_3\kanban\functions.c
 	<stdlib.h>
 	<stdio.h>
 	<string.h>

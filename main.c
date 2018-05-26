@@ -120,8 +120,7 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                                         break;
                                 case 2:
                                         printf("\n     [DOING] -> [DONE]");
-                                        printf("\n  *Desvincula Trabalhador atual.*\n");
-                                        pass_section(Doing,Done,P_Lista,0,2,3);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação */
+                                        pass_section(Doing,Done,P_Lista,0,1,3);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação */
                                         break;
                                 default:
                                         break;
@@ -145,7 +144,7 @@ void menu(lista_pessoas P_Lista, lista_task T_Lista, lista_task Todo, lista_task
                                 case 2:
                                         printf("\n     [DONE] -> [DOING]");
                                         printf("\n  *Atribuicao obrigatoria.*\n");
-                                        pass_section(Done,Doing,P_Lista,1,2,2);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação */
+                                        pass_section(Done,Doing,P_Lista,0,1,2);  /* flag = 1 refere uma atribuicao | flag = 0 refere uma desvinculação */
                                         break;
                                 default:
                                         break;

@@ -351,6 +351,7 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
                 prox = prox->next;
         }
         prox = temp->next;
+
         i = 1;
         prox = temp->next;
         while(prox != NULL && check == 0){
@@ -529,6 +530,28 @@ void insere_tarefa(lista_task lista, Task *nova, int flag){ /* Inserir uma taref
                       }
 
                 }
+                else if(flag == 5){ /* Ordenamento por ordem fase */
+
+                        while(nova->fase > then->tarefa->fase && then->next != NULL){
+
+                                ante = then;
+                                then = then->next;
+                        }
+
+                      if( nova->fase < then->tarefa->fase ){
+
+                                ante->next = no;
+                                no->next = then;
+
+                      }
+                      else{
+
+                                no->next = then->next;
+                                then->next = no;
+
+                      }
+
+                }
 
         }
 
@@ -653,13 +676,16 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
                 got = get_task(lista_t,&ant,&task, id);
 
                 if(got && act->p->mytasks->n < act->p->max_task){
+
                         week_check = weekly_gap(act->p->mytasks,task->tarefa->prazo);
+
                         if(task->tarefa->worker == NULL && week_check != 1){
-                                insere_tarefa(act->p->mytasks,task->tarefa,0);
+                                insere_tarefa(act->p->mytasks,task->tarefa,5);
                                 task->tarefa->worker = act->p;
                                 task->tarefa->personId=act->p->id;
                                 passed = 1;
-                        }else if(week_check == 1){
+                        }
+                        else if(week_check == 1){
                                 printf("Este trabalhador ja tem tarefas para esta semana.\n\n");
                         }
                         else if(task->tarefa->worker->id == act->p->id){
@@ -669,9 +695,11 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
                                 printf("Esta tarefa ja esta atribuida\n\n");
                         }
 
-                }else if( act->p->mytasks->n > act->p->max_task){
+                }
+                else if( act->p->mytasks->n > act->p->max_task){
                         printf("\nNumero de tarefas maximo atingido. Tarefa nao associada.\n\n");
-                }else{
+                }
+                else{
                         printf("ID errado. Tente novamente.\n\n");
                 }
 
@@ -718,22 +746,28 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
         int id, found, comp, comp2;
         int trys = 0;
         int *idp = (int *)malloc(sizeof(int));
-
+        int week_check = 0;
         int passed = 0;
-
+        Data *d;
         lista_task ante, pos;
+        lista_task bef,then;
+        lista_pessoas post, nex;
 
         printf("\n_____Passagem de Sector_____\n\n");
 
         if(from->next == NULL){
                 printf("\nEsta seccao nao tem tarefas disponiveis para passagem\n\n");
-        }else{
+        }
 
-                if(flag == 1){ /*Somente Adicionar e/ou Retirar trabalhador*/
+        else{
 
-                       passed = atribui_tarefa(lista_p, from, idp);
+                if(flag == 1){
+
+                        passed = atribui_tarefa(lista_p, from, idp);
 
                         if(passed){
+
+                                get_worker(lista_p,&post,&nex,*idp);
 
                                 printf("\nProcessando tarefa com ID: %d\n\n",*idp);
 
@@ -748,51 +782,46 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                         if(passed){ /* alterar prazo final */
 
                                                 printf("\nNovo prazo final ");
-
+                                                d = pos->tarefa->prazo;
                                                 pos->tarefa->prazo = set_data();
-
-                                                while( check_date_erros(pos->tarefa->prazo)){
-                                                        printf("Prazo final ");
-                                                        pos->tarefa->prazo = set_data();
-                                                }
-
-                                                comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);  /*Teste de verificação de data*/
-
-                                                while((comp == 0 || comp == 1) && (trys != 3)){
+                                                comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);
+                                                passed = check_date_erros(pos->tarefa->prazo);
+                                                while(((comp == 0 || comp == 1) || passed == 1)   && (trys != 3)){
                                                         printf("\nPrazo inserido nao valido. Tente novamente.\n\n");
                                                         printf("Novo Prazo final ");
                                                         pos->tarefa->prazo = set_data();
                                                         comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);
+                                                        passed = check_date_erros(pos->tarefa->prazo);
                                                         trys++;
                                                 }
-                                                if(trys == 3){
-                                                        printf("\nExcedeu o numero maximo de tentativas para corrigir o erro.\n");
-                                                        printf("\nTodas as alteracoes serao revertidas.\n");
+
+                                                week_check = weekly_gap(nex->p->mytasks,pos->tarefa->prazo);
+                                                printf("%d",week_check);
+                                                if(trys == 3 || week_check == 1){
+                                                        desassocia_tarefa(pos->tarefa);
+                                                        pos->tarefa->prazo = d;
+                                                        printf("Tarefa não assiciada. Tente novamente.\n");
                                                 }
-
-
                                         }
-
-                                        if(tipo == 2){
-                                                pos->tarefa->fim = NULL;
-                                        }
-                                        if(trys != 3){
+                                        if((week_check == 0 || nex->next->p->mytasks->n == 1) && trys != 3){
+                                                 if(tipo == 2){
+                                                        pos->tarefa->fim = NULL;
+                                                }
                                                 pos->tarefa->fase = fase;
                                                 insere_tarefa(to,pos->tarefa,3);
                                                 elimina_no_task(from,ante,pos);
                                         }
-
                                 }
                         }
                         else if(!passed){
                                 printf("\nImpossivel mover tarefa para sector uma vez que nao foi associada com sucesso.\n");
                         }
                         else{
-                                printf("ID errado. Tente novamente.\n\n");
+                                printf("Algo esta errado. Tente novamente.\n\n");
                         }
 
                 }
-                else if(flag == 0){ /* Somente desvincular*/
+                else if(flag == 0){
 
                         printf("\nVer lista de tarefas disponiveis? [ 1 - sim / 0 - nao]\n-> ");
                         scanf("%d",&passed);
@@ -807,60 +836,68 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                         scanf("%d",&id);
                         getchar();
                         found = get_task(from,&ante,&pos,id);
-
                         printf("%d",found);
 
                         if(found){
 
-                                if(tipo != 0){   /* Colocar data de conclusao */
+                                if(tipo == 1){   /* Colocar data de conclusao */
 
-                                        printf("\nPor favor indique a data de conclusao da tarefa:\n");
-                                        printf("Data de conclusao ");
-                                        pos->tarefa->fim = set_data();
-
-                                        while(check_date_erros(pos->tarefa->fim) && trys != 3){
+                                        if(fase == 3){
+                                                printf("\nPor favor indique a data de conclusao da tarefa:\n");
                                                 printf("Data de conclusao ");
                                                 pos->tarefa->fim = set_data();
-                                                trys++;
-                                        }
 
-                                        if(trys != 3){
-
-                                                trys = 0;
-
-                                                comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
-                                                comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
-
-                                                while(comp2 == 1 || comp == -1){
-                                                        printf("\nData de conclusao inserida nao valida. Tente novamente.\n\n");
+                                                while(check_date_erros(pos->tarefa->fim) && trys != 3){
                                                         printf("Data de conclusao ");
                                                         pos->tarefa->fim = set_data();
-                                                        comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
-                                                        comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
                                                         trys++;
                                                 }
-                                                if(trys == 3){
+
+                                                if(trys != 3){
+
+                                                        trys = 0;
+
+                                                        comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
+                                                        comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
+
+                                                        while((comp2 == 1 || comp == -1) && trys != 3){
+                                                                printf("\nData de conclusao inserida nao valida. Tente novamente.\n\n");
+                                                                printf("Data de conclusao ");
+                                                                pos->tarefa->fim = set_data();
+                                                                comp = compare_date(pos->tarefa->prazo,pos->tarefa->fim);
+                                                                comp2 = compare_date(pos->tarefa->inicio,pos->tarefa->fim);
+                                                                trys++;
+                                                        }
+                                                }
+                                                else{
+
                                                         printf("\nExcedeu o numero maximo de tentativas para corrigir o erro.\n");
                                                         printf("\nTodas as alteracoes serao revertidas.\n");
-                                                }else{
-                                                        desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
-                                                        pos->tarefa->fase = fase;
-                                                        insere_tarefa(to,pos->tarefa,1);
+
                                                 }
+                                        }
 
-                                        }else{
-
-                                                printf("\nExcedeu o numero maximo de tentativas para corrigir o erro.\n");
-                                                printf("\nTodas as alteracoes serao revertidas.\n");
-
+                                         if(trys == 3){
+                                                        printf("\nExcedeu o numero maximo de tentativas para corrigir o erro.\n");
+                                                        printf("\nTodas as alteracoes serao revertidas.\n");
+                                        }
+                                        else{
+                                                if(fase == 3){
+                                                        insere_tarefa(to,pos->tarefa,1);
+                                                }else if(fase == 2){
+                                                        insere_tarefa(to,pos->tarefa,3);
+                                                        pos->tarefa->fim = NULL;
+                                                }
+                                                pos->tarefa->fase = fase;
+                                                get_task(pos->tarefa->worker->mytasks,&bef,&then,pos->tarefa->id);
+                                                elimina_no_task(pos->tarefa->worker->mytasks,bef,then);
+                                                insere_tarefa(pos->tarefa->worker->mytasks,then->tarefa,5);
                                         }
 
                                 }
 
                                 else if(tipo == 0){
-                                        if(pos->tarefa->fase == 2){
-                                                desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
-                                        }
+                                        desassocia_tarefa(pos->tarefa);   /* Desvincula trabalhador da tarefa atual */
                                         pos->tarefa->fim = NULL;
                                         pos->tarefa->fase = fase;
                                         insere_tarefa(to,pos->tarefa,2);
@@ -869,13 +906,13 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                         elimina_no_task(from,ante,pos);
                                 }
 
-                        }else{
+                        }
+                        else{
                                 printf("\nAlgo correu mal. Tente novamente.\n\n");
                         }
-
                 }
         }
-
+        free(idp);
 
         printf("Pressione Enter para continuar... ");
         getchar();
@@ -1022,7 +1059,6 @@ int weekly_gap(lista_task lista, Data*d2){ /*Verificar se os prazos estão presen
                 dia = prox->tarefa->prazo->dia;
                 mes = prox->tarefa->prazo->mes;
                 ano = prox->tarefa->prazo->ano;
-
                 wday_v = get_week_day(prox->tarefa->prazo);
 
                 if(d2->ano == ano){
@@ -1082,7 +1118,7 @@ void eliminate_task(lista_task lista, lista_task todo, lista_task done){ /* elim
         found = get_task(lista,&ant,&act,id);
 
         if(found){
-                if(act->tarefa->fase == 2){
+                if(act->tarefa->fase == 2 || act->tarefa->fase == 3){
                         printf("\nNao e possivel eliminar tarefas que tenham trabalhadores associados.\n\n");
                 }else{
                         elimina_no_task(lista,ant,act);
@@ -1114,7 +1150,7 @@ void elimina_no_worker(lista_pessoas lista, lista_pessoas ant, lista_pessoas act
 
 }
 
-void eliminate_worker(lista_pessoas lista){
+void eliminate_worker(lista_pessoas lista){ /*eliminar trabalhador permanentemente */
 
         int id, found;
         lista_pessoas ant;
@@ -1443,29 +1479,36 @@ void sector_selector(lista_task Todo, lista_task Doing, lista_task Done, lista_p
 
         if(task->fase == 1){
                 insere_tarefa(Todo,task,2);
-        }else if( task-> fase == 2){
+        }
+        else if( task-> fase == 2 || task->fase == 3){
+
                 if(P_Lista->n != 0){
+
                         get = get_worker(P_Lista,&ante,&worker,task->personId);
                         printf("%d",get);
+
                         if(get == 0 ){
                                 task->personId = 0;
                                 task->fase = 1;
                                 insere_tarefa(Todo,task,2);
-                        }else{
+                        }
+                        else if(task->fase ==2){
                                 task->worker = worker->p;
-                                insere_tarefa(worker->p->mytasks,task,0);
+                                insere_tarefa(worker->p->mytasks,task,5);
                                 insere_tarefa(Doing,task,3);
                         }
+                        else if(task->fase == 3){
+                                task->worker = worker->p;
+                                insere_tarefa(worker->p->mytasks,task,5);
+                                insere_tarefa(Done,task,1);
+                        }
+
                 }else{
                         task->personId = 0;
                         task->fase = 1;
                         insere_tarefa(Todo,task,2);
                 }
-
-        }else if(task->fase == 3){
-                insere_tarefa(Done,task,1);
-        }
-
+}
 }
 
 void upload_info_task(lista_task T_Lista, lista_task To_do, lista_task Doing, lista_task Done, lista_pessoas P_Lista){ /* carregamento de informacao em ficheiro */
