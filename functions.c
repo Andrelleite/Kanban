@@ -572,7 +572,14 @@ void imprime_lista_tarefas(lista_task lista){ /* Fazer diplay de TODAS as tarefa
                 printf("__________________________________________________\n\n");
                 while(act != NULL){
                         tarefa = act->tarefa;
-                        printf("Fase em Kankan: %d\n",tarefa->fase);
+                        if(tarefa->fase == 1){
+                                printf("Fase em Kankan: To do\n");
+                        }else if(tarefa->fase ==2){
+                                printf("Fase em Kankan: Doing\n");
+                        }
+                        else{
+                                printf("Fase em Kankan: Done\n");
+                        }
                         printf("Descricao: %s\n",tarefa->descricao);
                         printf("Prioridade: %d\n",tarefa->priority);
                         printf("ID tarefa: %d\n",tarefa->id);
