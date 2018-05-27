@@ -101,6 +101,8 @@ int check_date_erros(Data *data);
 
 void upload_info(lista_pessoas P_Lista);
 
+int count_parameters(Pessoa *p);
+
 void upload_workers(Pessoa *nova, lista_pessoas lista, lista_pessoas rep);
 
 void put_on_text(lista_pessoas lista);

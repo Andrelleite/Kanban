@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "header.h"
 
 void running(lista_pessoas P_Lista, lista_task T_Lista, lista_task To_do, lista_task Doing, lista_task Done){

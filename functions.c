@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "header.h"
 
 
@@ -1267,6 +1268,7 @@ void correct_id(lista_pessoas lista, lista_pessoas rep){ /*Coloca o ids corretam
 void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em ficheiro */
 
         int i , j, l;
+        int miss = 0;
         int max_t;
         FILE *file = fopen("workers.txt","r");
         char *p, *q;
@@ -1316,24 +1318,40 @@ void upload_info(lista_pessoas P_Lista){ /* carregamento de informacao em fichei
                                         while(nova->nome == NULL){
                                                 nova->nome = (char *)malloc(i*sizeof(char));
                                         }
+                                        if((temp[0] == ' ') || strlen(temp) <= 1){
+                                                miss++;
+                                        }
                                         sprintf(nova->nome,"%s",temp);
                                 }else if(j == 1){
                                         nova->idade = atoi(temp);
+                                        if((temp[0] == ' ') || (temp[0] >= '@' && temp[0] <= 'Z')){
+                                                miss++;
+                                        }
                                 }else if(j == 2){
                                         nova->mail = (char *)malloc(i*sizeof(char));
                                         while(nova->mail == NULL){
                                                 nova->mail = (char *)malloc(i*sizeof(char));
                                         }
+                                         if((temp[0] == ' ') || strlen(temp) <= 3){
+                                                miss++;
+                                        }
                                         sprintf(nova->mail,"%s",temp);
                                 }else if(j == 3){
                                         nova->id = atoi(temp);
+                                        if((temp[0] == ' ') || (temp[0] >= '@' && temp[0] <= 'Z')){
+                                                miss++;
+                                        }
                                 }
                                 j++;
                                 memset(temp, 0, sizeof(temp));
                                 p++;
 
                         }
-                        upload_workers(nova,P_Lista,repetidos);
+                        if(miss >= 1){
+                                free(nova);
+                        }else{
+                                upload_workers(nova,P_Lista,repetidos);
+                        }
                 }else if(l == 1){
                         sscanf(line,"%s %d",temp,&max_t);
                         memset(temp, 0, sizeof(temp));
