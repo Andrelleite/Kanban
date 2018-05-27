@@ -1,8 +1,8 @@
 [ID,Prioridade,Definição,Data_inicio,Data_fim,Prazo,fase]
 
-1,10,Entregar Teste,1,17/11/1997,20/8/2185,20/8/2185,3
+1,10,Entregar Teste,0,17/11/1997,0/0/0,20/8/2185,1
 6,6,Outra Tarefa,0,19/8/2016,0/0/0,15/5/2017,1
 5,8,Meta 3,0,10/7/2017,0/0/0,22/6/2018,1
 4,7,Relatorio de entrega,4,4/5/2018,24/6/2018,25/6/2018,3
-2,10,Entregar Projeto,1,10/5/2018,0/0/0,29/6/2018,2
 3,8,Entregar Relatorio,4,10/5/2018,2/6/2018,1/9/2019,3
+2,10,Entregar Projeto,0,10/5/2018,0/0/0,29/6/2018,1

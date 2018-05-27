@@ -292,6 +292,7 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
         Task *nova = (Task *)malloc(sizeof(Task));
         int comp;
         int i;
+        int erros;
         int check = 0;
         lista_task prox;
         lista_task temp = cria_lista_tarefas();
@@ -327,22 +328,15 @@ Task *cria_tarefa(lista_task lista){ /* Criar uma tarefa em memória */
 
         printf("Prazo final ");
         nova->prazo = set_data();
-
-        while(check_date_erros(nova->prazo)){
-                printf("Prazo final ");
-                nova->prazo = set_data();
-
-        }
-
-
+        erros = check_date_erros(nova->prazo);
         comp = compare_date(nova->inicio,nova->prazo);
 
-        while(comp == 1 || comp == 0){
+        while(comp == 1 || comp == 0 || erros == 1){
                 printf("\nPrazo definido nao excede a data de criacao. Insira novamente.\n\n");
                 printf("Prazo final ");
                 nova->prazo = set_data();
                 comp = compare_date(nova->inicio,nova->prazo);
-
+                erros = check_date_erros(nova->prazo);
         }
 
         prox = lista->next;
