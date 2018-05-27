@@ -675,7 +675,6 @@ int atribui_tarefa(lista_pessoas lista_p, lista_task lista_t, int *idp){ /*atrib
                 printf("\n");
 
                 *idp = id;
-                printf("%s",act->p->nome);
                 got = get_task(lista_t,&ant,&task, id);
 
                 if(got && act->p->mytasks->n < act->p->max_task){
@@ -785,7 +784,6 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                                 pos->tarefa->prazo = set_data();
                                                 comp = compare_date(pos->tarefa->inicio,pos->tarefa->prazo);
                                                 passed = check_date_erros(pos->tarefa->prazo);
-                                                printf("%d %d",passed,comp);
 
                                                 while((comp == 0 || comp == 1|| passed == 1)   && (trys != 3)){
                                                         printf("\nPrazo inserido nao valido. Tente novamente.\n\n");
@@ -800,7 +798,7 @@ void pass_section(lista_task from, lista_task to, lista_pessoas lista_p, int fla
                                                 if(trys == 3 || week_check == 1){
                                                         desassocia_tarefa(pos->tarefa);
                                                         pos->tarefa->prazo = d;
-                                                        printf("Tarefa não assiciada. Tente novamente.\n");
+                                                        printf("\nTarefa nao assiciada. Tente novamente.\n");
                                                 }
                                         }
                                         if((week_check == 0 || nex->next->p->mytasks->n == 1) && trys != 3){
